@@ -1,0 +1,64 @@
+Keep vision towers with head_dim % 32 != 0 (Qwen2.5-VL ViT = 80) off vLLM's
+bundled FA2 kernel. Not needed on Blackwell (sm_100+ already forces SDPA).
+
+--- a/vllm/model_executor/models/vision.py
++++ b/vllm/model_executor/models/vision.py
+@@ -98,6 +98,18 @@
+     if selected_backend is not None:
+         return selected_backend
+ 
++    # PATCH: on A100 (sm_80) the platform picks FLASH_ATTN for
++    # ViT head sizes that FlashAttentionBackend.supports_head_size() claims to support,
++    # but vLLM's bundled FA2 varlen kernel rejects any head_dim not a multiple of 32
++    # (Qwen2.5-VL ViT head_dim=80 -> runtime "headdim not a multiple of 32" crash).
++    # Blackwell already forces TORCH_SDPA for all ViTs (see cuda.py); mirror that here for
++    # non-mult-of-32 head sizes on pre-Blackwell GPUs. head_size%32==0 ViTs
++    # (InternVL=128) keep the normal FA path; eval passes TORCH_SDPA via
++    # attn_backend_override and returns early above, so it is unaffected.
++    if head_size % 32 != 0:
++        from vllm.attention.backends.registry import AttentionBackendEnum
++        return AttentionBackendEnum.TORCH_SDPA
++
+     return current_platform.get_vit_attn_backend(head_size, dtype)
+ 
+ 
+--- a/vllm/attention/layer.py
++++ b/vllm/attention/layer.py
+@@ -114,11 +114,20 @@
+             return AttentionBackendEnum.TORCH_SDPA, None
+ 
+     elif current_platform.is_cuda():
++        # PATCH: RESPECT the incoming attn_backend. The
++        # VisionTransformer already computed it via get_vit_attn_backend(head_size=head_dim)
++        # (patched in vision.py to return TORCH_SDPA for head_dim%32!=0, e.g. Qwen2.5-VL
++        # ViT=80, and FLASH_ATTN for head_dim%32==0, e.g. InternVL=128). The OLD blanket
++        # auto-upgrade SDPA->FA2 below forced the 80-dim ViT onto FA2 -> RuntimeError
++        # "headdim not a multiple of 32" on A100. We only enable upstream-FA wiring when
++        # the incoming backend is ALREADY a flash family; we never upgrade SDPA.
++        # (InternVL comes in as FLASH_ATTN, so it is unaffected.) Revert = restore the
++        # `attn_backend = FLASH_ATTN; use_upstream_fa = True` upgrade block.
+         if (
+-            attn_backend != AttentionBackendEnum.FLASH_ATTN
++            attn_backend == AttentionBackendEnum.FLASH_ATTN
++            and attn_backend_override is None
+             and check_upstream_fa_availability(torch.get_default_dtype())
+         ):
+-            attn_backend = AttentionBackendEnum.FLASH_ATTN
+             use_upstream_fa = True
+     elif current_platform.is_xpu():
+         assert attn_backend == AttentionBackendEnum.FLASH_ATTN, (
+@@ -516,6 +525,14 @@
+         attn_backend_override = None
+         if multimodal_config is not None:
+             attn_backend_override = multimodal_config.mm_encoder_attn_backend
++        # PATCH: vLLM's bundled flash-attn rejects a ViT head_dim that is
++        # not a multiple of 32 (Qwen2.5-VL ViT head_dim=80 -> "headdim not a multiple of
++        # 32"). Force SDPA for such ViTs when the caller didn't already pick a backend.
++        # This covers the TRAINING rollout path (trl colocate constructs LLM() WITHOUT
++        # mm_encoder_attn_backend); head_dim%32==0 ViTs (InternVL=128) keep FLASH_ATTN,
++        # and eval (passes TORCH_SDPA explicitly) is unaffected.
++        if attn_backend_override is None and head_size % 32 != 0:
++            attn_backend_override = AttentionBackendEnum.TORCH_SDPA
+         backend = get_vit_attn_backend(
+             head_size=head_size,
+             dtype=dtype,

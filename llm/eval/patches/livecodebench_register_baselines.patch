@@ -1,0 +1,210 @@
+Register the models evaluated in the paper with the LiveCodeBench runner,
+and add a Gemma-3 prompt style. Point the local entries at your own
+checkpoints, or evaluate the published HF ids directly.
+
+diff --git a/lcb_runner/lm_styles.py b/lcb_runner/lm_styles.py
+index d10b211..5c66d36 100644
+--- a/lcb_runner/lm_styles.py
++++ b/lcb_runner/lm_styles.py
+@@ -30,6 +30,7 @@ class LMStyle(Enum):
+     CodeQwenInstruct = "CodeQwenInstruct"
+     QwQ = "QwQ"
+     LLaMa3 = "LLaMa3"
++    Gemma3 = "Gemma3"
+     DeepSeekR1 = "DeepSeekR1"
+ 
+     TogetherAI = "TogetherAI"
+@@ -861,6 +862,193 @@ LanguageModelList: list[LanguageModel] = [
+         datetime(2024, 4, 1),
+         "https://huggingface.co/agentica-org/DeepCoder-14B-Preview",
+     ),
++    # ---- models evaluated in the paper ----
++    LanguageModel(
++        "Qwen/Qwen2.5-3B",
++        "Qwen2.5-3B-Base",
++        LMStyle.GenericBase,
++        datetime(2024, 9, 18),
++        "https://huggingface.co/Qwen/Qwen2.5-3B",
++    ),
++    LanguageModel(
++        "meta-llama/Llama-3.2-3B-Instruct",
++        "Llama-3.2-3B-Ins",
++        LMStyle.LLaMa3,
++        datetime(2024, 9, 25),
++        "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct",
++    ),
++    LanguageModel(
++        # No native Phi style in LCB yet; using GenericBase (no chat wrap) — scores
++        # may underestimate true capability without a Phi-specific prompt template.
++        "microsoft/Phi-3.5-mini-instruct",
++        "Phi-3.5-mini-Ins",
++        LMStyle.GenericBase,
++        datetime(2024, 8, 20),
++        "https://huggingface.co/microsoft/Phi-3.5-mini-instruct",
++    ),
++    LanguageModel(
++        "google/gemma-3-4b-it",
++        "Gemma3-4B-it",
++        LMStyle.Gemma3,
++        datetime(2025, 3, 12),
++        "https://huggingface.co/google/gemma-3-4b-it",
++    ),
++    # ---- Co-RL and baseline checkpoints (chat-tuned) ----
++    LanguageModel(
++        "q1716523669/cogrpo-heter-qwen25-3b-x-llama32-3b-math345-bs2-groupA-qwen",
++        "CoGRPO-Heter-Qwen2.5-3B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2025, 5, 31),
++        "https://huggingface.co/q1716523669/cogrpo-heter-qwen25-3b-x-llama32-3b-math345-bs2-groupA-qwen",
++    ),
++    LanguageModel(
++        "q1716523669/cogrpo-heter-qwen25-3b-x-llama32-3b-math345-bs2-groupB-llama",
++        "CoGRPO-Heter-Llama-3.2-3B",
++        LMStyle.LLaMa3,
++        datetime(2025, 5, 31),
++        "https://huggingface.co/q1716523669/cogrpo-heter-qwen25-3b-x-llama32-3b-math345-bs2-groupB-llama",
++    ),
++    LanguageModel(
++        "q1716523669/cogrpo-homo-qwen25-3b-math345-groupA",
++        "CoGRPO-Homo-Qwen2.5-3B-A",
++        LMStyle.CodeQwenInstruct,
++        datetime(2025, 5, 31),
++        "https://huggingface.co/q1716523669/cogrpo-homo-qwen25-3b-math345-groupA",
++    ),
++    LanguageModel(
++        "q1716523669/cogrpo-homo-qwen25-3b-math345-groupB",
++        "CoGRPO-Homo-Qwen2.5-3B-B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2025, 5, 31),
++        "https://huggingface.co/q1716523669/cogrpo-homo-qwen25-3b-math345-groupB",
++    ),
++    # ---- 7B/8B checkpoints and base models ----
++    LanguageModel(
++        "q1716523669/qwen25-7b-selfcertainty-math345-eb128",
++        "Intuitor-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-selfcertainty-math345-eb128",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-decoupled-rephrQ-x-llama31-8b-origL-groupA-qwen",
++        "Decoupled-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-decoupled-rephrQ-x-llama31-8b-origL-groupA-qwen",
++    ),
++    LanguageModel(
++        "q1716523669/cogrpo-homo-qwen25-7b-math345-groupA",
++        "CoGRPO-Homo-Qwen2.5-7B-A",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/cogrpo-homo-qwen25-7b-math345-groupA",
++    ),
++    LanguageModel(
++        "q1716523669/cogrpo-homo-qwen25-7b-math345-groupB",
++        "CoGRPO-Homo-Qwen2.5-7B-B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/cogrpo-homo-qwen25-7b-math345-groupB",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-heter-x-llama31-8b-math345-lr3e-6-groupA-qwen",
++        "CoGRPO-Heter-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-heter-x-llama31-8b-math345-lr3e-6-groupA-qwen",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-entropy-math345-eb128-lr3e-6",
++        "RENT-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-entropy-math345-eb128-lr3e-6",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-unmaj-math345-eb128-lr3e-6",
++        "TTRL-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-unmaj-math345-eb128-lr3e-6",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-gtgrpo-math345-eb128-lr3e-6",
++        "GT-GRPO-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-gtgrpo-math345-eb128-lr3e-6",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-crii-math345-lr3e-6",
++        "CR-II-Qwen2.5-7B",
++        LMStyle.CodeQwenInstruct,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-crii-math345-lr3e-6",
++    ),
++    LanguageModel(
++        "q1716523669/llama31-8b-selfcertainty-math345-eb128",
++        "Intuitor-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/llama31-8b-selfcertainty-math345-eb128",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-decoupled-origQ-x-llama31-8b-rephrL-groupB-llama",
++        "Decoupled-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-decoupled-origQ-x-llama31-8b-rephrL-groupB-llama",
++    ),
++    LanguageModel(
++        "q1716523669/qwen25-7b-heter-x-llama31-8b-math345-lr3e-6-groupB-llama",
++        "CoGRPO-Heter-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/qwen25-7b-heter-x-llama31-8b-math345-lr3e-6-groupB-llama",
++    ),
++    LanguageModel(
++        "q1716523669/llama31-8b-entropy-math345-eb128",
++        "RENT-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/llama31-8b-entropy-math345-eb128",
++    ),
++    LanguageModel(
++        "q1716523669/llama31-8b-unmaj-math345-eb128",
++        "TTRL-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/llama31-8b-unmaj-math345-eb128",
++    ),
++    LanguageModel(
++        "q1716523669/llama31-8b-gtgrpo-math345-eb128",
++        "GT-GRPO-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/llama31-8b-gtgrpo-math345-eb128",
++    ),
++    LanguageModel(
++        "q1716523669/llama31-8b-crii-math345-lr3e-6",
++        "CR-II-Llama-3.1-8B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/llama31-8b-crii-math345-lr3e-6",
++    ),
++    LanguageModel(
++        "q1716523669/Llama-3.2-3B-Instruct-CoRewarding-II-MATH345",
++        "CR-II-Llama-3.2-3B",
++        LMStyle.LLaMa3,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/q1716523669/Llama-3.2-3B-Instruct-CoRewarding-II-MATH345",
++    ),
++    LanguageModel(
++        "Qwen/Qwen2.5-7B",
++        "Qwen2.5-7B-Base",
++        LMStyle.GenericBase,
++        datetime(2026, 6, 10),
++        "https://huggingface.co/Qwen/Qwen2.5-7B",
++    ),
+ ]
+ 
+ LanguageModelStore: dict[str, LanguageModel] = {

@@ -1,0 +1,31 @@
+# MATH-500 — chat-friendly zero-shot variant.
+# Default lm-eval `minerva_math500` uses Minerva-style 4-shot prompt with
+# `Final Answer:` format. Chat-tuned models (e.g. Gemma3) ignore this format
+# and emit conversational responses without \boxed{...}, leading to 75%+
+# extraction failures and unfairly low scores.
+#
+# This variant uses 0-shot with explicit "put final answer in \boxed{}"
+# instruction (same template as our amc23 custom task).
+# Reuses utils.process_results_amc (boxed extraction + math_verify grading).
+task: math_500_chat
+dataset_path: HuggingFaceH4/MATH-500
+dataset_name: null
+test_split: test
+training_split: null
+fewshot_split: null
+output_type: generate_until
+doc_to_text: "{{problem}}\n Please reason step by step, and put your final answer within \\boxed{}."
+doc_to_target: "{{answer}}"
+process_results: !function utils.process_results_amc
+generation_kwargs:
+  max_gen_toks: 3072
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  until: []
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

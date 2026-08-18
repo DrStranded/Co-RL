@@ -1,0 +1,60 @@
+Co-RL
+Copyright 2026 The Co-RL Authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes third-party software.
+
+--------------------------------------------------------------------------------
+Math answer parsing and grading
+  trainers/*/verifiers/qwen/{qwen_math_parser,math_grade,math_normalize}.py
+
+Derived from:
+  - Qwen2.5-Math evaluation utilities (Alibaba, Apache-2.0)
+    https://github.com/QwenLM/Qwen2.5-Math
+  - open-r1 (HuggingFace, Apache-2.0)
+    https://github.com/huggingface/open-r1
+  - prm800k grading utilities (OpenAI, MIT)
+    https://github.com/openai/prm800k
+  - ToRA evaluation utilities (Microsoft, MIT)
+    https://github.com/microsoft/ToRA
+
+MIT License (prm800k, ToRA):
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+Coding-task reward
+  trainers/co_rl/comas/code_reward.py
+
+Follows the evaluation contract of CoMAS / MARTI (Apache-2.0)
+  https://github.com/bytedance/MARTI
+
+--------------------------------------------------------------------------------
+Built on
+
+  TRL                     https://github.com/huggingface/trl            Apache-2.0
+  vLLM                    https://github.com/vllm-project/vllm          Apache-2.0
+  DeepSpeed               https://github.com/deepspeedai/DeepSpeed      Apache-2.0
+  lm-evaluation-harness   https://github.com/EleutherAI/lm-evaluation-harness  MIT
+  LiveCodeBench           https://github.com/LiveCodeBench/LiveCodeBench       MIT
+  mathruler               https://github.com/hiyouga/mathruler          Apache-2.0
+  R1-V                    https://github.com/Deep-Agent/R1-V            Apache-2.0
+
+Benchmark and training data are distributed by their original authors under
+their own licenses; see each dataset's page on the HuggingFace Hub.

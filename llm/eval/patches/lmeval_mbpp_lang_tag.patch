@@ -1,0 +1,17 @@
+--- a/lm_eval/tasks/mbpp/utils.py
++++ b/lm_eval/tasks/mbpp/utils.py
+@@ -33,8 +33,12 @@
+     # vLLM may leak SentencePiece's "▁" (U+2581) for some tokenizers (Gemma3 etc.).
+     # Replace with normal space so Python indentation is valid.
+     text = text.replace("▁", " ")
+-    # Pattern to match ```...``` blocks
+-    pattern = r"```(?:\w+)?\n?(.*?)\n?```"
++    # Pattern to match ```...``` blocks.
++    # Language tag must be followed by a newline: with the "```" we prepend below,
++    # a raw-code response like "def f():" would otherwise have its first keyword
++    # ("def"/"from"/"import") swallowed as the language tag → SyntaxError → 0.0
++    # (observed with Qwen-instruct via chat_template, which emits unfenced code).
++    pattern = r"```(?:\w+[ \t]*\n)?\n?(.*?)\n?```"
+     # (+ ```) as we add the opening "```python" to the gen_prefix
+     matches = re.findall(pattern, r"```" + text, re.DOTALL)
+     # if no matches, try to match ```...``` blocks (after removing the language)

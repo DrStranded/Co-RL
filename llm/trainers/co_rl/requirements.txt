@@ -1,0 +1,18 @@
+# co_rl extra dependencies on top of trl + accelerate + deepspeed + vllm.
+#
+# Install with:
+#   pip install -r trainers/co_rl/requirements.txt
+#
+# These come from the qwen verifier (verifiers/qwen/), which co_label_utils.py
+# imports for extract_answer / grade_answer / normalize_answer.
+
+sympy
+regex
+latex2sympy2
+pylatexenc
+word2number
+
+# --- Optional ---
+# Only needed for the coding benchmarks
+# Uncomment if so:
+# lm-eval[vllm]

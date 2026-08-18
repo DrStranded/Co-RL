@@ -1,0 +1,38 @@
+diff --git a/lm_eval/tasks/humaneval/utils.py b/lm_eval/tasks/humaneval/utils.py
+index 24dd011..fb8bb78 100644
+--- a/lm_eval/tasks/humaneval/utils.py
++++ b/lm_eval/tasks/humaneval/utils.py
+@@ -30,10 +30,15 @@ def build_predictions(resps: list[list[str]], docs: list[dict]) -> list[list[str
+ def build_predictions_instruct(
+     resps: list[list[str]], docs: list[dict]
+ ) -> list[list[str]]:
++    def _clean(r: str) -> str:
++        # vLLM may leak SentencePiece's "▁" (U+2581) when detokenizing some
++        # tokenizers (notably Gemma3). Replace with space so indent is valid Python.
++        r = r.replace("▁", " ")
++        # Strip everything after the first closing code fence.
++        if "```" in r:
++            r = r[: r.find("```")]
++        return r
+     return [
+-        [
+-            doc["prompt"] + (r if r.find("```") == -1 else r[: r.find("```")])
+-            for r in resp
+-        ]
++        [doc["prompt"] + _clean(r) for r in resp]
+         for resp, doc in zip(resps, docs)
+     ]
+diff --git a/lm_eval/tasks/mbpp/utils.py b/lm_eval/tasks/mbpp/utils.py
+index c205a23..2483648 100644
+--- a/lm_eval/tasks/mbpp/utils.py
++++ b/lm_eval/tasks/mbpp/utils.py
+@@ -30,6 +30,9 @@ def pass_at_1(
+ 
+ 
+ def extract_code_blocks(text: str) -> str:
++    # vLLM may leak SentencePiece's "▁" (U+2581) for some tokenizers (Gemma3 etc.).
++    # Replace with normal space so Python indentation is valid.
++    text = text.replace("▁", " ")
+     # Pattern to match ```...``` blocks
+     pattern = r"```(?:\w+)?\n?(.*?)\n?```"
+     # (+ ```) as we add the opening "```python" to the gen_prefix

@@ -1,0 +1,29 @@
+Fill NaN sampling logprobs with the sequence mean instead of crashing the run
+(observed with Gemma-3; neutral importance ratio, each occurrence logged).
+
+--- a/trl/trainer/grpo_trainer.py
++++ b/trl/trainer/grpo_trainer.py
+@@ -1900,6 +1900,21 @@
+             completion_mask, padding_value=0, padding_side="right", pad_to_multiple_of=self.pad_to_multiple_of
+         ).to(device=device)
+         if sampling_per_token_logps_list is not None:
++            # vLLM returns NaN logprobs for some tokens; extract_logprobs maps
++            # them to None, and torch.tensor(None) would raise and kill the
++            # run. Fill with the sequence mean (neutral importance ratio) and
++            # log the occurrence.
++            def _fill_nan_logps(_seq):
++                if not any(_x is None for _x in _seq):
++                    return _seq
++                _valid = [_x for _x in _seq if _x is not None]
++                _fill = (sum(_valid) / len(_valid)) if _valid else 0.0
++                _n = len(_seq) - len(_valid)
++                print(f"[nan-logprob] {_n}/{len(_seq)} token logprobs were NaN; "
++                      f"filled with the sequence mean {_fill:.4f}", flush=True)
++                return [_fill if _x is None else _x for _x in _seq]
++
++            sampling_per_token_logps_list = [
++                _fill_nan_logps(_s) for _s in sampling_per_token_logps_list
++            ]
+             sampling_per_token_logps = [torch.tensor(logps) for logps in sampling_per_token_logps_list]
+             sampling_per_token_logps = pad(
+                 sampling_per_token_logps,

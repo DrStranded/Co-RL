@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+*.whl
+work_dirs/
+outputs/
+wandb/
+data/*/images/
+*.log

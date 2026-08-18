@@ -1,0 +1,41 @@
+# AMC 2023 — 83 problems from the AMC 10/12 2023 sets curated by AI-MO.
+# Source: AI-MO/aimo-validation-amc (train split)
+# Answers are numeric / simple symbolic; we compare with math_verify.
+#
+# Reported as avg@8: each problem is decoded 8× with sampling (T=0.6, top_p=0.95),
+# graded independently, then averaged. This matches the Co-rewarding (ICLR 2026) AMC
+# protocol (ttrl library, avg@8) so numbers line up with their main table.
+# `repeats: 8` runs each doc 8×; the mean aggregation averages over all 83×8 samples.
+# Lower `repeats` to trade accuracy for speed.
+task: amc23
+dataset_path: AI-MO/aimo-validation-amc
+dataset_name: null
+test_split: train
+training_split: null
+fewshot_split: null
+output_type: generate_until
+repeats: 8
+doc_to_text: "{{problem}}\n Please reason step by step, and put your final answer within \\boxed{}."
+doc_to_target: "{{answer}}"
+process_results: !function utils.process_results_amc
+generation_kwargs:
+  max_gen_toks: 4096
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  until: []
+# Without an explicit filter lm-eval applies its default `take_first`,
+# which discards 7 of the 8 `repeats` before they reach process_results --
+# so the column was pass@1 at 8x the cost while the paper calls it avg@8.
+# take_first_k with k=8 passes all of them through; the grader averages.
+filter_list:
+  - name: avg8
+    filter:
+      - function: take_first_k
+        k: 8
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

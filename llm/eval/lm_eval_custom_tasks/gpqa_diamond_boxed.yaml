@@ -1,0 +1,29 @@
+# GPQA-Diamond, CoMAS-aligned (arXiv 2510.08529).
+# Generative + \boxed{A-D} extraction (utils.process_results_gpqa) so numbers are
+# directly comparable to CoMAS/Co-rewarding. Replaces lm-eval's native
+# gpqa_diamond_cot_zeroshot, whose (A)/"The answer is" filters miss the \boxed{A}
+# that \boxed-trained RL ckpts emit (~37% of answers → wrongly scored 0).
+# Choices shuffled with a per-doc fixed seed (reproducible, unlike native).
+task: gpqa_diamond_boxed
+dataset_path: Idavidrein/gpqa
+dataset_name: gpqa_diamond
+output_type: generate_until
+process_docs: !function utils.process_docs_gpqa
+training_split: train
+validation_split: train
+test_split: null
+doc_to_text: "What is the correct answer to this question: {{Question}}\nChoices:\n(A) {{choice1}}\n(B) {{choice2}}\n(C) {{choice3}}\n(D) {{choice4}}\nPlease reason step by step, and put the letter of the correct choice within \\boxed{}."
+doc_to_target: answer
+process_results: !function utils.process_results_gpqa
+generation_kwargs:
+  max_gen_toks: 2048
+  do_sample: false
+  temperature: 0.0
+  until: []
+num_fewshot: 0
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

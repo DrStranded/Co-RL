@@ -1,0 +1,13 @@
+Pass VLLM_MM_ENCODER_ATTN_BACKEND through to the colocate-rollout LLM()
+(Qwen2.5-VL ViT head_dim=80 needs a non-FA2 backend).
+
+--- a/trl/generation/vllm_generation.py
++++ b/trl/generation/vllm_generation.py
+@@ -355,6 +355,7 @@
+                 # Important so temperature scaling/logit tweaking affects the TIS log probs
+                 logprobs_mode="processed_logprobs",
+                 quantization=quantization,
++                mm_encoder_attn_backend=os.environ.get("VLLM_MM_ENCODER_ATTN_BACKEND"),
+             )
+             if self.enable_sleep_mode:
+                 self.llm.sleep(level=2)
