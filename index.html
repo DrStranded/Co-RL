@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Co-RL: label-free RL where each model is rewarded by a peer's majority vote. More diverse cohorts make better teachers.">
+  <meta name="theme-color" content="#f8f7f3">
+  <title>Co-RL</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Co-RL: Unsupervised Reasoning Emerges from Diverse Cohort in Multi-agent RL">
+  <meta property="og:description" content="Label-free RL where each model is rewarded by a peer's majority vote. More diverse cohorts make better teachers.">
+  <meta property="og:url" content="https://drstranded.github.io/Co-RL/">
+  <meta property="og:image" content="https://drstranded.github.io/Co-RL/static/images/fig-overview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237b50a2'/%3E%3Ccircle cx='22' cy='32' r='9' fill='%23f8f7f3'/%3E%3Ccircle cx='42' cy='32' r='9' fill='none' stroke='%23f8f7f3' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-2">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Co-RL — back to top"><b>CO-RL</b> · DIVERSE COHORT</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#method">Method</a>
+        <a href="#verdict">Vs. labels</a>
+        <a href="#ladder">The ladder</a>
+        <a href="#probe">The probe</a>
+        <a href="#results">Benchmarks</a>
+        <a href="#controls">Controls</a>
+        <a href="#theory">Theory</a>
+        <a href="#resources">Run it</a>
+        <a href="#bibtex">BibTeX</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= HERO ================= -->
+    <section class="hero section-shell" aria-label="Paper overview">
+      <p class="kicker">Label-free RL for reasoning · the reward comes from a peer, not from yourself</p>
+      <h1 id="paper-title">Co-RL: Unsupervised Reasoning Emerges from <em>Diverse Cohort</em> in Multi-agent RL</h1>
+      <p class="hero-question">Self-rewarding RL reinforces whatever the model already believes.
+        <mark class="signal-highlight">How different does a peer have to be before its vote is worth learning from?</mark></p>
+      <div class="authors" id="authors">
+        <span>Yunhao Yang<sup>1,*</sup></span>
+        <span>Yuexin Bian<sup>2,*</sup></span>
+        <span>Yunjie Tian<sup>4</sup></span>
+        <span>Di Fu<sup>4</sup></span>
+        <span>Tianjin Huang<sup>3</sup></span>
+        <span>Yuanyuan Shi<sup>2</sup></span>
+        <span>Ziang Xiao<sup>1</sup></span>
+        <span>Nuno Vasconcelos<sup>2</sup></span>
+        <span>Yijiang Li<sup>2,†</sup></span>
+      </div>
+      <p class="affiliations" id="affiliations">
+        <sup>1</sup> Johns Hopkins University &nbsp;·&nbsp;
+        <sup>2</sup> UC San Diego &nbsp;·&nbsp;
+        <sup>3</sup> University of Exeter &nbsp;·&nbsp;
+        <sup>4</sup> Independent Researcher
+      </p>
+      <p class="author-notes">* equal contribution · † project lead</p>
+      <div class="hero-links" aria-label="Paper resources">
+        <a class="button button-dark" href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Paper <span aria-hidden="true">↗</span></a>
+        <a class="button button-light" href="https://github.com/DrStranded/Co-RL" target="_blank" rel="noreferrer">Code <span aria-hidden="true">↗</span></a>
+        <a class="button button-light" href="#bibtex">BibTeX</a>
+      </div>
+      <div class="stat-strip" aria-label="Headline numbers">
+        <div class="stat-chip"><strong>κ 0.53 → 0.38</strong>
+          <span>Error overlap between two agents, same lineage → different family. Measured on twelve base-checkpoint pairs, before any RL.</span></div>
+        <div class="stat-chip"><strong>+3.0–8.6% · +2.3–7.2%</strong>
+          <span>Average gains with zero ground-truth labels: seven text benchmarks across four LLMs, four multimodal benchmarks across five vision-language models (2B–12B).</span></div>
+        <div class="stat-chip"><strong>+0.8–2.0%</strong>
+          <span>Margin over the strongest self-rewarding baseline on the seven-benchmark text suite.</span></div>
+      </div>
+    </section>
+
+    <!-- ================= METHOD ================= -->
+    <section id="method" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">01 / Method</p>
+        <h2>The reward comes from a peer, never from yourself.</h2>
+        <p class="lede">TTRL rewards a rollout for matching the policy's own majority vote. Intuitor rewards
+          token-level confidence, RENT rewards low predictive entropy, and Co-rewarding-II rewards agreement
+          with the vote of a slowly updated moving-average copy of the same weights. Every one of these signals is a
+          function of the policy being updated. Without an external reference, the model is rewarded for
+          being confident — not for being right — and training can drift toward homogenized responses,
+          degeneration, or divergence.</p>
+      </div>
+
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig1-compare-ring.png" aria-label="Enlarge the comparison of label-free reward designs">
+          <img src="static/images/fig1-compare-ring.png" width="2400" height="684"
+               alt="Comparison of four label-free reward designs: TTRL and Co-rewarding derive rewards from self-generated agreement, CoMAS scores multi-turn interactions with one of its own agents as judge, and Co-RL derives rewards directly from peer votes, passed along a directed ring beyond two agents.">
+        </button>
+        <figcaption>Where the reward comes from in four label-free designs. TTRL and Co-rewarding derive rewards
+          from self-generated agreement; CoMAS scores multi-turn interactions with one of its own agents acting
+          as judge. Co-RL derives rewards directly from peer votes — beyond two agents, the votes pass along a
+          directed ring. Click to enlarge.</figcaption>
+      </figure>
+
+      <div class="step-grid" aria-label="The three steps of Co-RL">
+        <div class="step-card"><span class="idx">STEP 01</span>
+          <strong>Sample and vote</strong>
+          <p>Each of N agents independently samples K completions for the same unlabeled prompt and reduces
+             them to a self-consistency majority vote.</p></div>
+        <div class="step-card"><span class="idx">STEP 02</span>
+          <strong>Reward against the peer</strong>
+          <p>Agent n receives reward 1 when its extracted answer equals the majority vote of agent n−1,
+             indices cyclic — so agent 1 is supervised by agent N. An agent never contributes to its own
+             supervision target.</p></div>
+        <div class="step-card"><span class="idx">STEP 03</span>
+          <strong>Independent GRPO step</strong>
+          <p>Each policy normalizes rewards within its own rollout group and takes its own GRPO update.
+             No shared parameters, no exchanged gradients.</p></div>
+      </div>
+
+      <div class="equation-card" aria-label="Core equations">
+        <div class="eq">â<sub>−n</sub>(x) ∈ argmax<sub>b</sub> Σ<sub>j=1..K</sub> 𝟙[ a<sub>n−1</sub><sup>j</sup> = b ]&nbsp;&nbsp;<span class="c">— peer pseudo-label (ring)</span></div>
+        <div class="eq">r<sub>n</sub><sup>k</sup> = 𝟙[ a<sub>n</sub><sup>k</sup> = â<sub>−n</sub>(x) ]&nbsp;&nbsp;<span class="c">— indicator reward</span></div>
+        <div class="eq">max<sub>θ</sub> <b>J</b><sub>Co-RL</sub>(θ) = (1/N) Σ<sub>n</sub> <b>J</b><sub>GRPO</sub>(θ<sub>n</sub>; {y<sub>n</sub><sup>k</sup>, r<sub>n</sub><sup>k</sup>})</div>
+        <p class="eq-note">The framework accepts any policy optimizer that takes sequence-level rewards;
+          the paper uses GRPO and names REINFORCE++ as an alternative.</p>
+      </div>
+
+      <div class="algo-block" aria-label="Algorithm sketch">
+        <div class="algo-head">One training step, N agents</div>
+<pre>for each agent n = 1..N (in parallel, disjoint GPUs):
+    sample K completions  y_n^1..y_n^K  ~  π_θn(·|x)      <span class="c"># same unlabeled prompt x</span>
+    a_n  ←  majority_vote( extract(y_n^1..y_n^K) )         <span class="c"># self-consistency vote</span>
+exchange votes                                             <span class="c"># the ONLY cross-agent step</span>
+for each agent n:
+    r_n^k  ←  1[ extract(y_n^k) == a_(n−1) ]               <span class="c"># peer's vote is the target</span>
+    θ_n    ←  GRPO_update(θ_n, group-normalized r_n)       <span class="c"># independent optimizer state</span></pre>
+      </div>
+
+      <p class="pull-quote">"The agents share neither parameters nor gradients; their optimization is
+        coupled solely through the rewards they provide to one another."</p>
+
+      <div class="contrast-strip" aria-label="What Co-RL is not">
+        <div class="contrast-cell"><p class="eyebrow">Self-rewarding · TTRL, Co-rewarding</p>
+          <p>The reward is computed from the model's own agreement with itself — its majority vote, a
+             paraphrase, or a moving-average copy of the same weights.</p></div>
+        <div class="contrast-cell"><p class="eyebrow">Judge-based multi-agent · CoMAS</p>
+          <p>Agents debate in multi-turn interactions, and one of the system's own agents acts as an LLM
+             judge that scores the exchange into a reward.</p></div>
+        <div class="contrast-cell ours"><p class="eyebrow">Co-RL</p>
+          <p>No judge, no learned reward model, no message passing. One exchanged vote per prompt, from an
+             independently trained peer, along a directed ring.</p></div>
+      </div>
+
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-overview.png" aria-label="Enlarge the Co-RL overview diagram">
+          <img src="static/images/fig-overview.png" width="2169" height="1338" loading="lazy"
+               alt="Overview of Co-RL with two agents: each agent samples K responses to the same unlabeled question, forms a majority-vote pseudo-label, and each rollout is rewarded by agreement with the peer's pseudo-label, followed by independent GRPO updates.">
+        </button>
+        <figcaption>Co-RL with two agents. Each agent samples K responses, votes, and is rewarded by agreement
+          with its peer's vote — then updates its own policy. Click to enlarge.</figcaption>
+      </figure>
+
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
+          <img src="static/images/fig-dynamics-4scale.png" width="2200" height="1579" loading="lazy"
+               alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence; Co-RL stays stable.">
+        </button>
+        <figcaption>Training dynamics at four scales (Qwen2.5-3B, Llama-3.2-3B, Qwen2.5-7B, Llama-3.1-8B):
+          validation accuracy, within-group reward standard deviation, mean completion length. Runs marked
+          diverged leave the plotted range. Click to enlarge.</figcaption>
+      </figure>
+      <div class="read-chips" aria-label="How to read the dynamics figure">
+        <span class="read-chip"><b>RENT</b> drives reward std → 0 with sharp increases in completion length</span>
+        <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
+        <span class="read-chip"><b>Co-RL</b> holds stable reward variation and completion lengths at all four scales</span>
+      </div>
+
+      <div class="callout honesty">
+        <span class="tag">Stated plainly</span>
+        TTRL is the most stable self-rewarding baseline in the training-dynamics figure and the strongest
+        self-rewarding row on both 3B backbones — on Llama-3.2-3B-Instruct its 43.1 average even edges
+        Co-RL (Same family) at 42.7. At 7B/8B, RENT (52.8 on Qwen2.5-7B) and Co-rewarding-II (46.6 on
+        Llama-3.1-8B-Instruct) post the strongest self-rewarding averages. The failure of self-rewarding is
+        degeneration or saturation, not universal collapse.
+      </div>
+
+      <div class="callout">
+        <span class="tag">The pivot</span>
+        Separate parameters are enough to stop the degeneration — a same-family pair already trains stably.
+        But a peer that fails on the same problems hands you back your own error: a same-family target largely
+        repeats what the agent would have answered anyway. The question is not how to shape the reward.
+        <strong>It is who is on the other end of it.</strong>
+      </div>
+    </section>
+
+    <!-- ================= VERDICT ================= -->
+    <section id="verdict" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">02 / Against the labeled reference</p>
+        <h2>Trained without labels, measured against training with them.</h2>
+        <p class="lede">Every Co-RL run on this page uses zero ground-truth labels. GT-Reward is the same GRPO
+          recipe trained on the labels, under the same budget, included as a labeled reference. One chip per
+          backbone-and-training-set block in the paper.</p>
+      </div>
+      <div class="panel">
+        <div class="controls-row">
+          <label>Domain
+            <select id="verdict-domain" aria-label="Filter by domain">
+              <option value="all">All</option>
+              <option value="text">Text</option>
+              <option value="vlm">Vision-language</option>
+            </select>
+          </label>
+          <button class="toggle-button" id="verdict-df-only" type="button" aria-pressed="false">Different family only</button>
+        </div>
+        <div class="chip-grid" id="verdict-chips" aria-live="polite"></div>
+        <p class="scope-note">
+          GT-Reward is GRPO with ground-truth rewards under this same recipe and budget — a labeled reference,
+          not a bound on what supervised training can reach. Apart from AMC (avg@8, averaged over three
+          evaluation seeds), every number is a single run evaluated single-sample; the paper attaches no
+          variance to sub-point differences. Settings where Co-RL falls below the reference are never hidden
+          (three in the default best-variant view; a fourth appears under Different family only). Vision-language chips marked MMR1 use the corrected multiple-choice grader and open-r1
+          chips the legacy grader, so the two are never compared with each other.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= LADDER ================= -->
+    <section id="ladder" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">03 / The decoupling ladder</p>
+        <h2>Five rungs of decoupling</h2>
+        <p class="lede">"Diversity" on this page is not a vibe — it is an ordered, named, measurable axis.
+          Each rung decouples one more thing between the two agents, and Co-RL's three published variants
+          are positions on it. κ is Cohen's kappa over error patterns: lower means more decoupled errors.</p>
+      </div>
+      <div class="ladder-layout">
+        <div class="rung-rail" id="rung-rail" aria-label="Decoupling rungs"></div>
+        <div class="rung-panel" id="rung-panel" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ================= PROBE ================= -->
+    <section id="probe" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">04 / The probe</p>
+        <h2>The ladder is measurable before you train — and it survives training</h2>
+        <p class="lede">Base checkpoints, 500 MATH problems at levels 3–5, zero-shot, single sample at
+          T&nbsp;=&nbsp;0.8, rule-based extraction and equivalence checking. Every problem lands in one of
+          four cells for a pair of models, and all four diversity measures are counts over those cells.</p>
+      </div>
+
+      <div class="tab-rail" aria-label="Probe views">
+        <button class="tab-button is-active" data-tab="probe-a" aria-pressed="true">Twelve pairs, before RL</button>
+        <button class="tab-button" data-tab="probe-b" aria-pressed="false">Same capability, different partner</button>
+        <button class="tab-button" data-tab="probe-c" aria-pressed="false">During training</button>
+      </div>
+
+      <div class="tab-panel" id="probe-a">
+        <table class="contingency" aria-label="The four outcomes for a pair of models">
+          <tr><th></th><th>B correct</th><th>B wrong</th></tr>
+          <tr><th>A correct</th><td>both correct</td><td>only A correct</td></tr>
+          <tr><th>A wrong</th><td>only B correct</td><td class="hot">both wrong</td></tr>
+        </table>
+        <p>Complementarity <em>c</em> is the share where exactly one model is correct — the case where one
+          model can correct the other. Wrong-agreement <em>w</em> is the part of the both-wrong cell where the
+          two models return the <em>same</em> answer: the case a majority vote cannot detect. Cohen's κ
+          measures how strongly the pair lands in the same cells beyond chance.</p>
+        <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Strip plot of Cohen's kappa for the twelve model pairs: every different-family pair at or below 0.42, every same-family and seed-only pair at or above 0.51, with the band between shaded and labeled no pair lands here."></div>
+        <div class="callout">
+          <span class="tag">The finding</span>
+          Every different-family pair reaches κ ≤ 0.42 and c ≥ 29.4%. Every same-family and seed-only pair
+          sits at κ ≥ 0.51 and c ≤ 24.6%. <strong>No pair falls between the two groups, at either tier.</strong>
+          Averaged within groups, crossing families lowers κ from 0.53 to 0.38 and raises c from 23.2% to
+          30.8%. Same-family and seed-only pairs are not distinguishable from one another: changing the size,
+          the generation, or the sampling seed within a lineage leaves the error structure where it was.
+        </div>
+        <div class="data-table-wrap" id="probe-pool-table"></div>
+        <div class="callout scope">
+          <span class="tag">Scope</span>
+          κ and c are two readings of one four-cell measurement — across the twelve pairs they correlate at
+          r&nbsp;=&nbsp;−0.98 — so they are not independent evidence; w is the genuinely additional reading.
+          Twelve pairs, several sharing an anchor checkpoint; two different-family partners (Phi-3.5-mini,
+          MiniCPM3-4B) never appear in a training run. The probe orders the rungs; it does not predict final
+          accuracy quantitatively.
+        </div>
+      </div>
+
+      <div class="tab-panel" id="probe-b" hidden>
+        <p>Group averages mix models of different strength, so here one model is held fixed and only its
+          partner varies. Because the seed-only row is the anchor paired with itself, capability is identical
+          along each ladder — the source of the partner is the only variable.</p>
+        <div class="chart-wrap" id="anchor-charts"></div>
+        <p class="chart-note">A same-family partner lowers κ by 0.04 and 0.07; a different-family partner
+          lowers it by 0.18 and 0.16 while raising c by 9.2% and 10.4%. Wrong-agreement w points the same way
+          and is lowest for the different-family partner under both anchors — but it does not order the middle
+          rows, and the page says so out loud.</p>
+      </div>
+
+      <div class="tab-panel" id="probe-c" hidden>
+        <figure class="media-card">
+          <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
+            <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
+                 alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
+          </button>
+          <figcaption><strong>What to look at:</strong> (a) inter-model agreement rises and flattens — and
+            different families flatten <em>lower</em>; (b) crossing families yields more
+            accurate pseudo-labels, so the extra disagreement is not extra noise; (c) evaluation performance
+            orders the runs the same way. More disagreement at equal pseudo-label accuracy is exactly the
+            disagreement worth having: the peer being right where the agent is wrong. Click to enlarge.</figcaption>
+        </figure>
+        <figure class="media-card">
+          <button class="media-button" type="button" data-lightbox="static/images/fig-vlm-dynamics.png" aria-label="Enlarge the vision-language training dynamics">
+            <img src="static/images/fig-vlm-dynamics.png" width="2200" height="608" loading="lazy"
+                 alt="Vision-language training dynamics: the agents retain partial agreement while the accuracy of their exchanged pseudo-labels improves throughout training.">
+          </button>
+          <figcaption>The same pattern in the multimodal domain: the agents retain partial agreement while the
+            accuracy of their exchanged pseudo-labels improves throughout training. Click to enlarge.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ================= RESULTS ================= -->
+    <section id="results" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">05 / Benchmarks</p>
+        <h2>Climbing the rungs, on eleven benchmarks</h2>
+        <p class="lede">Seven text benchmarks (math, code, science) and four multimodal math benchmarks.
+          Base and GT-Reward are references, excluded from the label-free ranking; bold is the best label-free
+          result, underline the second best, exactly as marked in the paper.</p>
+      </div>
+      <div class="panel">
+        <div class="controls-row">
+          <label>Domain
+            <select id="results-domain" aria-label="Choose a results domain">
+              <option value="text">Text LLMs</option>
+              <option value="vlm">Vision-language</option>
+              <option value="n3">Three agents</option>
+            </select>
+          </label>
+          <label id="results-backbone-label">Backbone
+            <select id="results-backbone" aria-label="Choose a backbone"></select>
+          </label>
+        </div>
+        <div class="chart-wrap" id="results-ladder" aria-hidden="true"></div>
+        <div class="data-table-wrap" id="results-table" aria-live="polite"></div>
+        <div id="results-note"></div>
+      </div>
+    </section>
+
+    <!-- ================= CONTROLS ================= -->
+    <section id="controls" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">06 / Controls</p>
+        <h2>It is the partner, not the budget</h2>
+        <p class="lede">The three cheapest dismissals — "you trained two models", "you ensembled at test
+          time", "multi-agent RL already does this" — each get a controlled answer with numbers attached.</p>
+      </div>
+      <div class="cards-3" id="controls-cards"></div>
+    </section>
+
+    <!-- ================= THEORY ================= -->
+    <section id="theory" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">07 / Theory</p>
+        <h2>Why a peer's vote can be worth more than your own</h2>
+        <p class="lede">The paper reduces each prompt to two outcomes and tracks the probability p that an
+          agent answers correctly, under GRPO dynamics. The same analysis that explains the gains also states
+          exactly where they stop.</p>
+      </div>
+      <div class="theory-layout">
+        <div class="accordion" id="theory-accordion">
+          <div class="acc-item is-open">
+            <button class="acc-toggle" type="button" aria-expanded="true">The two dynamics, side by side
+              <span class="acc-icon" aria-hidden="true">+</span></button>
+            <div class="acc-body">
+              <p>Under self-rewarding, the pseudo-label is constructed from the same rollout group being
+                optimized — "making the update self-confirming: so the agent reinforces whichever answer is
+                currently more likely, whether correct or not." Under Co-RL, the update magnitude
+                q<sub>K</sub>(p<sub>A</sub>) is strictly positive, so agent A's update <em>direction</em> is
+                set entirely by φ<sub>K</sub>(p<sub>B</sub>) — the signed majority-vote direction of its peer.
+                That is the formal content of "who your partner is".</p>
+              <div class="formal">ṗ_A = q_K(p_A) · φ_K(p_B),&nbsp;&nbsp;ṗ_B = q_K(p_B) · φ_K(p_A)</div>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-toggle" type="button" aria-expanded="false">Proposition 2 — self-rewarding is self-confirming
+              <span class="acc-icon" aria-hidden="true">+</span></button>
+            <div class="acc-body">
+              <p>For odd K, the expected self-rewarding update satisfies
+                sign(G<sub>K</sub><sup>self</sup>(p)) = sign(p − ½). So p(0) &lt; ½ implies p(t) → 0 and
+                p(0) &gt; ½ implies p(t) → 1: <strong>self-rewarding cannot recover a prompt it starts out
+                wrong on</strong> — it further suppresses the correct answer instead of correcting the error.</p>
+              <div class="formal">sign(G_K^self(p)) = sign(p − 1/2) &nbsp;⇒&nbsp; p(0)&lt;1/2 → p→0,&nbsp; p(0)&gt;1/2 → p→1</div>
+            </div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-toggle" type="button" aria-expanded="false">Theorem 1 — the basin gets strictly larger
+              <span class="acc-icon" aria-hidden="true">+</span></button>
+            <div class="acc-body">
+              <p>In the symmetric two-agent dynamics, the consensus states (1,1) and (0,0) are asymptotically
+                stable, and (½,½) is a saddle whose interior separatrix is p<sub>A</sub> + p<sub>B</sub> = 1.
+                The pair converges to the correct answer whenever p<sub>A</sub>(0) + p<sub>B</sub>(0) &gt; 1 —
+                strictly weaker than requiring both agents individually above ½.</p>
+              <div class="formal">B_self = { p_A &gt; 1/2 ∧ p_B &gt; 1/2 } &nbsp;⊊&nbsp; B_Co-RL = { p_A + p_B &gt; 1 }</div>
+            </div>
+          </div>
+          <div class="takeaway"><b>Takeaway:</b> Co-RL leverages complementary strengths to expand correct
+            convergence. In the paper's worked example — (p<sub>A</sub>, p<sub>B</sub>) = (0.9, 0.2) on half
+            the prompts and (0.2, 0.9) on the other half — each agent averages 0.55; self-rewarding converges
+            to accuracy 0.5, Co-RL to 1.0, because p<sub>A</sub> + p<sub>B</sub> = 1.1 &gt; 1 on every prompt.</div>
+          <div class="limits-strip">
+            <span class="tag" style="font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 6px;">Where it stops</span>
+            (0,0) is asymptotically stable too: a pair that starts below the separatrix converges together on
+            the wrong answer. Co-RL widens the good basin — it does not remove the bad one. That failure mode
+            is exactly what wrong-agreement w measures in the probe, and it is lowest for different-family
+            pairs (1.8% for Qwen2.5-7B × Llama-3.1-8B) and highest for seed-only ones (5.2%). How the number,
+            diversity, and interaction topology of agents shape cross-agent learning remains open; the
+            directed ring is one topology among several.
+          </div>
+        </div>
+        <aside class="theory-aside">
+          <figure class="phase-card">
+            <div id="phase-diagram" role="img" aria-label="Phase plane of the two-agent dynamics: the unit square with separatrix p_A plus p_B equals 1, the correct-convergence basin above it, the incorrect-convergence basin below it, stable fixed points at (0,0) and (1,1), a saddle at (0.5,0.5), and the worked example points (0.9,0.2) and (0.2,0.9) on the separatrix's upper side."></div>
+            <figcaption><strong>The reduced model of Theorem 1, not a simulation of training.</strong>
+              Scope: two outcomes per prompt, odd K, clipping and the KL term ignored, symmetric agents, a
+              single fixed prompt. The experiments use an even K with ties resolved deterministically.</figcaption>
+          </figure>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= RESOURCES ================= -->
+    <section id="resources" class="section-shell section-block">
+      <div class="section-head">
+        <p class="eyebrow">08 / Run it</p>
+        <h2>Pick your own rung</h2>
+        <p class="lede">In the public release, the rungs are literally the launcher filenames. Apache-2.0,
+          baselines included.</p>
+      </div>
+      <div class="res-grid">
+        <div class="res-card">
+          <h3>Repository map</h3>
+          <ul>
+            <li><code>llm/</code> — text experiments on MATH levels 3–5: <code>trainers/co_rl/</code> (Co-RL),
+              <code>trainers/self_rewarding/</code> (TTRL, RENT, Intuitor), <code>trainers/grpo/</code>
+              (GT-Reward reference), <code>eval/</code> (seven-benchmark suite).</li>
+            <li><code>mllm/</code> — vision-language experiments on open-r1 and MMR1, with the four-benchmark
+              evaluation suite.</li>
+            <li>The baselines on this page ship with the method. <code>tools/verify.py</code> asserts the
+              installed dependency versions match the paper runs.</li>
+          </ul>
+        </div>
+        <div class="res-card">
+          <h3>The configuration behind the reported numbers</h3>
+          <dl class="config-list">
+            <div><dt>Optimizer</dt><dd>AdamW; rollout temperature 1.0</dd></div>
+            <div><dt>Text runs</dt><dd>lr 3e-6, effective batch 128 prompts per agent, 3072-token cap, K = 12, 2 epochs</dd></div>
+            <div><dt>Vision-language runs</dt><dd>lr 1e-6, 1024-token cap, K = 8, 1 epoch; token-level truncation of the importance-sampling ratio on Gemma-3 (measured log-probability drift ≈ 0.13)</dd></div>
+            <div><dt>Hardware</dt><dd>One node of eight H100 GPUs, four per agent</dd></div>
+            <div><dt>Text eval</dt><dd>T = 0.6, top-p 0.95; AMC avg@8 over three seeds; GPQA Diamond, boxed prompt; LiveCodeBench v6 official harness</dd></div>
+            <div><dt>Vision-language eval</dt><dd>Greedy, 16384-token budget, images long-side ≤ 1024 px; two-stage grader — the LLM judge only recovers rule-grading false negatives and never overturns a rule-credited answer</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="code-block" aria-label="Quickstart and launchers">
+<pre><span class="c"># quickstart</span>
+git clone https://github.com/DrStranded/Co-RL &amp;&amp; cd Co-RL/llm
+pip install -r requirements.txt &amp;&amp; python tools/verify.py
+
+<span class="c"># the ladder, as launchers (illustrative small-pair configs — the paper's exact
+# configuration is listed above; swap MODEL_A / MODEL_B to move between rungs)</span>
+bash examples/ttrl_qwen25_1p5b.sh                                <span class="c"># baseline: TTRL</span>
+bash examples/same_family_qwen25_1p5b.sh                         <span class="c"># rung 1: same family</span>
+bash examples/different_family_qwen25_1p5b_x_llama32_1b.sh       <span class="c"># rung 2: different family</span>
+bash examples/n3_ring_qwen25_1p5b_x_llama32_1b_x_qwen3_0p6b.sh   <span class="c"># three-agent ring</span>
+cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.sh  <span class="c"># rung 4</span></pre>
+      </div>
+
+      <div class="bibtex-block" id="bibtex">
+        <div class="bibtex-head">
+          <span>BibTeX</span>
+          <button id="copy-bibtex" type="button">Copy</button>
+        </div>
+<pre id="bibtex-code">@article{yang2026corl,
+  title   = {Co-RL: Unsupervised Reasoning Emerges from Diverse Cohort in Multi-agent RL},
+  author  = {Yang, Yunhao and Bian, Yuexin and Tian, Yunjie and Fu, Di and Huang, Tianjin and Shi, Yuanyuan and Xiao, Ziang and Vasconcelos, Nuno and Li, Yijiang},
+  journal = {arXiv preprint arXiv:2608.17253},
+  year    = {2026},
+  eprint  = {2608.17253},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG}
+}</pre>
+      </div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Enlarged figure">
+    <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close">×</button>
+    <img id="lightbox-image" src="" alt="">
+  </div>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <p>Website for <a href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Co-RL: Unsupervised
+        Reasoning Emerges from Diverse Cohort in Multi-agent RL</a> (arXiv:2608.17253). Every number on this
+        page is taken from the paper; protocol caveats are stated next to the results they qualify.
+        Page design follows the <a href="https://zhiyuanjiang04.github.io/demystify-agent-skills/" target="_blank" rel="noreferrer">Agent
+        Skills</a> project page, in the lineage of the <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noreferrer">Nerfies</a> template.</p>
+    </div>
+  </footer>
+
+  <script src="static/data/content.js?v=20260819-2"></script>
+  <script src="static/data/results.js?v=20260819-2"></script>
+  <script src="static/js/site.js?v=20260819-2"></script>
+</body>
+</html>
