@@ -120,8 +120,8 @@ code { font-family: var(--mono); font-size: .92em; }
 
 /* ---------- shared section furniture ---------- */
 .section-head .eyebrow { margin-bottom: 10px; }
-.section-head h2 { font-size: clamp(34px, 4.6vw, 54px); line-height: 1.14; letter-spacing: -0.4px; margin: 0 0 18px; max-width: 1040px; }
-.section-head p.lede { color: var(--muted); font-size: 18px; line-height: 1.65; margin: 0 0 8px; max-width: 980px; }
+.section-head h2 { font-size: clamp(34px, 4.6vw, 54px); line-height: 1.14; letter-spacing: -0.4px; margin: 0 0 18px; }
+.section-head p.lede { color: var(--muted); font-size: 18px; line-height: 1.65; margin: 0 0 8px; }
 
 .media-card {
   background: var(--card); border: 1px solid var(--line); border-radius: 14px;
