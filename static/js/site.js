@@ -17,36 +17,6 @@
   const avgN = row => nf(avgOf(row));
   const rowBy = (rows, name) => rows.find(r => r.method === name);
 
-  /* =============== PROBE =============== */
-  const LEVEL_COLOR = { "different family": "#7b50a2", "same family": "#0072b2", "seed only": "#d99e2f" };
-
-  function renderKappaStrip() {
-    const XMAX = 0.62, B0 = 0.42, B1 = 0.51;
-    const pct = v => (v / XMAX * 100).toFixed(2);
-    const order = ["different family", "same family", "seed only"];
-    let html = "";
-    order.forEach(lv => {
-      const rows = R.decPool.filter(p => p.level === lv).sort((a, b) => a.kappa - b.kappa);
-      const lo = Math.min(...rows.map(p => p.kappa)).toFixed(2);
-      const hi = Math.max(...rows.map(p => p.kappa)).toFixed(2);
-      html += `<div class="dr-group">${esc(lv)} · κ ${lo}–${hi}</div>`;
-      rows.forEach(p => {
-        html += `<div class="dr-row kb-row">
-          <span class="dr-label"><b>${esc(p.pair)}</b><i>${esc(p.tier)}</i></span>
-          <span class="kb-track" title="${esc(p.pair)}: κ ${p.kappa}, complementarity ${p.c}%, wrong-agreement ${p.w}%, oracle ${p.u}%">
-            <span class="kb-band" style="left:${pct(B0)}%;width:${pct(B1 - B0)}%"></span>
-            <span class="kb-bar" style="width:${pct(p.kappa)}%;background:${LEVEL_COLOR[p.level]}"></span>
-          </span>
-          <span class="dr-nums"><b>${p.kappa.toFixed(2)}</b></span>
-        </div>`;
-      });
-    });
-    html += `<p class="chart-note">κ is Cohen's kappa over the two models' error patterns. Lower means they
-      fail on different problems. No bar ends inside the shaded strip. Hover a bar for the pair's
-      complementarity and wrong agreement.</p>`;
-    $("#kappa-strip").innerHTML = html;
-  }
-
   /* =============== RESULTS EXPLORER =============== */
   function methodRowClass(m) {
     if (m === "Base" || m === "GT-Reward") return "ref-row";
@@ -216,7 +186,6 @@
   }
 
   function init() {
-    renderKappaStrip();
     setupResults();
     setupLightbox();
     setupNav();

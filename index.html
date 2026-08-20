@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-10">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-11">
 </head>
 <body>
   <header class="site-header">
@@ -176,9 +176,9 @@
     <section id="why" class="section-shell section-block">
       <div class="section-head">
         <p class="eyebrow">04 / Why it works</p>
-        <h2>What a cohort teaches depends on how different its mistakes are.</h2>
-        <p class="lede">Highly similar models make correlated errors and can reinforce the same incorrect
-          answers. The paper therefore pushes diversity through three channels, and each one is measurable.</p>
+        <h2>What a peer teaches depends on how different its mistakes are.</h2>
+        <p class="lede">Two similar models make the same mistakes and can reinforce the same wrong answers.
+          The paper pushes diversity through three channels, and each one is measurable.</p>
       </div>
 
       <h3 class="sub-head">Decoupled policy optimization</h3>
@@ -197,7 +197,14 @@
       <p>Families differ in architecture, tokenization, and pretraining data, and vision-language families
         also differ in their vision encoders. How much two models' errors overlap can be measured before any
         training, on 500 MATH problems per pair.</p>
-      <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Bar chart of error overlap for the twelve model pairs, grouped by level: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty."></div>
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-kappa.png" aria-label="Enlarge the error overlap chart">
+          <img src="static/images/fig-kappa.png" width="2689" height="846" loading="lazy"
+               alt="Vertical bar chart of error overlap for twelve base-checkpoint pairs: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty.">
+        </button>
+        <figcaption>Error overlap κ (Cohen's kappa) for twelve base-checkpoint pairs, before any RL. Click to
+          enlarge.</figcaption>
+      </figure>
       <div class="callout">
         <span class="tag">The finding</span>
         Every different-family pair ends at or below <span class="num">κ 0.42</span> and every same-family or
@@ -275,29 +282,36 @@
         <h2>Three deeper ablations</h2>
       </div>
       <div class="cards-3">
-        <div class="control-card">
-          <p class="eyebrow">Matched training and inference budgets</p>
+        <div class="control-card accent-violet">
+          <p class="eyebrow">Matched budgets</p>
           <h3>Ensembling two TTRL models does not close the gap</h3>
-          <p>The same two base models are trained with TTRL and ensembled the same way, maj@8 on GSM8K,
-             MATH-500, and AMC.</p>
-          <img src="static/images/fig-abl-ensemble.png" width="1041" height="583" loading="lazy" class="card-fig"
-               alt="Dot plot of macro-average maj@8 scores: TTRL ensemble scores below its best single model, Co-RL ensemble scores above both of its members.">
+          <p>The same two base models are trained with TTRL and ensembled the same way, maj@8 on three math
+             benchmarks. Co-RL's ensemble reaches <span class="num">66.9%</span> versus
+             <span class="num bad">64.9%</span>, and the TTRL ensemble stays below its own best single
+             model.</p>
+          <img src="static/images/fig-abl-ensemble.png" width="1088" height="648" loading="lazy" class="card-fig"
+               alt="Vertical grouped bars of macro-average maj@8: Co-RL beats TTRL for both single models and for the ensemble, and the TTRL ensemble scores below its best single model.">
+          <a class="card-link" href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Open the paper <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="control-card">
-          <p class="eyebrow">Comparison with multi-agent RL</p>
+        <div class="control-card accent-blue">
+          <p class="eyebrow">Versus multi-agent RL</p>
           <h3>Co-RL beats CoMAS under CoMAS's own protocol</h3>
-          <p>Same setup, official implementation, and graders, with prior rows quoted from their paper. Half
-             the agents, no LLM judge.</p>
-          <img src="static/images/fig-abl-comas.png" width="1042" height="523" loading="lazy" class="card-fig"
-               alt="Dot plot of seven-benchmark averages under the CoMAS protocol: Base 56.92, MAPoRL 58.22, TTRL 58.18, CoMAS 58.94, Co-RL 62.97.">
+          <p>Same setup, official implementation, and graders, with prior rows quoted from their paper. Co-RL
+             reaches <span class="num">62.97%</span> versus <span class="num bad">58.94%</span> for CoMAS,
+             with half the agents and no judge.</p>
+          <img src="static/images/fig-abl-comas.png" width="1088" height="648" loading="lazy" class="card-fig"
+               alt="Vertical bars of seven-benchmark averages under the CoMAS protocol: Base 56.92, MAPoRL 58.22, TTRL 58.18, CoMAS 58.94, Co-RL 62.97.">
+          <a class="card-link" href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Open the paper <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="control-card">
-          <p class="eyebrow">Scaling to three agents</p>
+        <div class="control-card accent-amber">
+          <p class="eyebrow">Three agents</p>
           <h3>One ring trains three models, and all three improve</h3>
-          <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together. Each agent matches or beats
-             its own labeled reference.</p>
-          <img src="static/images/fig-abl-n3.png" width="1035" height="483" loading="lazy" class="card-fig"
-               alt="Dumbbell plot from Base to Co-RL for the three ring-trained models, with dashed GT-Reward ticks: gains of 7.8, 6.0, and 8.2 points.">
+          <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together in one ring. They gain
+             <span class="num">7.8%</span>, <span class="num">6.0%</span>, and <span class="num">8.2%</span>
+             and match or beat their labeled references.</p>
+          <img src="static/images/fig-abl-n3.png" width="1088" height="648" loading="lazy" class="card-fig"
+               alt="Vertical grouped bars from Base to Co-RL for the three ring-trained models with dashed GT-Reward marks: gains of 7.8, 6.0, and 8.2 points.">
+          <a class="card-link" href="#benchmarks">Full rows in the explorer</a>
         </div>
       </div>
     </section>
@@ -345,8 +359,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-10"></script>
-  <script src="static/data/results.js?v=20260819-10"></script>
-  <script src="static/js/site.js?v=20260819-10"></script>
+  <script src="static/data/content.js?v=20260819-11"></script>
+  <script src="static/data/results.js?v=20260819-11"></script>
+  <script src="static/js/site.js?v=20260819-11"></script>
 </body>
 </html>
