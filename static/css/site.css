@@ -130,8 +130,8 @@ code { font-family: var(--mono); font-size: .92em; }
 
 /* ---------- shared section furniture ---------- */
 .section-head .eyebrow { margin-bottom: 10px; }
-.section-head h2 { font-size: clamp(24px, 3vw, 34px); margin: 0 0 14px; }
-.section-head p.lede { color: var(--muted); font-size: 17px; margin: 0 0 8px; }
+.section-head h2 { font-size: clamp(34px, 4.6vw, 54px); line-height: 1.14; letter-spacing: -0.4px; margin: 0 0 18px; max-width: 1040px; }
+.section-head p.lede { color: var(--muted); font-size: 18px; line-height: 1.65; margin: 0 0 8px; max-width: 980px; }
 
 .media-card {
   background: var(--card); border: 1px solid var(--line); border-radius: 14px;
@@ -173,6 +173,15 @@ code { font-family: var(--mono); font-size: .92em; }
 .finding-row.is-open .fr-icon { transform: rotate(45deg); }
 .fr-body { padding: 0 22px 18px calc(190px + 42px); }
 .fr-body p { margin: 0; font-size: 14.5px; color: #3c4450; line-height: 1.6; }
+
+/* ---------- panel keys (text mapped to figure panels) ---------- */
+.panel-keys { list-style: none; margin: 18px 0 0; padding: 0; }
+.panel-keys li {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: baseline;
+  padding: 11px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.55; color: #3c4450;
+}
+.panel-keys li:last-child { border-bottom: 1px solid var(--line); }
+.panel-keys b { font-family: var(--mono); font-weight: 500; font-size: 13px; color: var(--violet-dark); }
 
 /* ---------- split rows ---------- */
 .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 30px; align-items: center; margin: 8px 0; }
@@ -251,7 +260,7 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 }
 
 /* ---------- explorer extras ---------- */
-.sub-head { font-family: var(--serif); font-weight: 400; font-size: 24px; margin: 48px 0 10px; }
+.sub-head { font-family: var(--serif); font-weight: 400; font-size: 27px; margin: 52px 0 12px; }
 .heat-note { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 12px; line-height: 1.6; }
 
 

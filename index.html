@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-14">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-15">
 </head>
 <body>
   <header class="site-header">
@@ -204,8 +204,15 @@
         <div>
           <h3 class="sub-head">Decoupled policy optimization</h3>
           <p>Each policy keeps its own parameters and optimizer state. The only interaction is the exchanged
-            vote. Panels (b) and (c) show that this alone stabilizes training relative to self-rewarding, and
-            panel (a) shows the two agents never collapse into agreement.</p>
+            vote.</p>
+          <ul class="panel-keys">
+            <li><b>(a)</b>Different families keep lower agreement during pseudo-labeling, and the two agents
+              never collapse into one voice.</li>
+            <li><b>(b)</b>Crossing families yields more accurate pseudo-labels, so the extra disagreement is
+              not extra noise.</li>
+            <li><b>(c)</b>Downstream accuracy is higher, and training stays stable relative to
+              self-rewarding.</li>
+          </ul>
         </div>
         <figure class="media-card">
           <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
@@ -387,8 +394,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-14"></script>
-  <script src="static/data/results.js?v=20260819-14"></script>
-  <script src="static/js/site.js?v=20260819-14"></script>
+  <script src="static/data/content.js?v=20260819-15"></script>
+  <script src="static/data/results.js?v=20260819-15"></script>
+  <script src="static/js/site.js?v=20260819-15"></script>
 </body>
 </html>
