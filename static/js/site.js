@@ -55,16 +55,6 @@
     return html + "</tbody></table>";
   }
 
-  const TEXT_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    Same family edges Different family on Qwen2.5-3B, so the ordering is directional rather than monotone on
-    every backbone. Different family beats the strongest self-rewarding baseline on all four text backbones.
-    Different family+ posts the best label-free average on all four, by <span class="num">0.8 to 2.0%</span>.</div>`;
-  const VLM_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    TTRL wins one of the four small-pair settings, on InternVL-3.5-2B with MMR1. At 7B to 12B, Co-RL beats
-    TTRL for all three families and beats the labeled reference on Gemma-3-12B.</div>`;
-  const N3_NOTE = `<div class="callout"><span class="tag">One run, three improved models</span>
-    Rows are per-agent from a single three-model run and are not read against the two-agent tables.</div>`;
-
   function resultsOptions(domain) {
     if (domain === "text") return R.llmMain.map((b, i) => ({ v: String(i), label: b.backbone + " (" + b.tier + ")" }));
     if (domain === "vlm") {
@@ -78,19 +68,18 @@
     const domain = $("#results-domain").value;
     const sel = $("#results-backbone");
     const key = sel.value;
-    let rows, headers, label, note;
+    let rows, headers, label;
     if (domain === "text") {
       const b = R.llmMain[Number(key) || 0];
-      rows = b.rows; headers = R.benchText; label = "Text results for " + b.backbone; note = TEXT_NOTE;
+      rows = b.rows; headers = R.benchText; label = "Text results for " + b.backbone;
     } else if (domain === "vlm") {
       const b = key && key[0] === "l" ? R.vlmLarge[Number(key.slice(1))] : R.vlmSmall[Number((key || "s0").slice(1))];
-      rows = b.rows; headers = R.benchVLM; label = "Multimodal results for " + b.backbone + " on " + b.dataset; note = VLM_NOTE;
+      rows = b.rows; headers = R.benchVLM; label = "Multimodal results for " + b.backbone + " on " + b.dataset;
     } else {
       const b = R.n3[Number(key) || 0];
-      rows = b.rows; headers = R.benchText; label = "Three-agent results for " + b.model; note = N3_NOTE;
+      rows = b.rows; headers = R.benchText; label = "Three-agent results for " + b.model;
     }
     $("#results-table").innerHTML = renderResultsTable(headers, rows, label);
-    $("#results-note").innerHTML = note;
   }
 
   function setupResults() {
