@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-15">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-16">
 </head>
 <body>
   <header class="site-header">
@@ -174,7 +174,9 @@
         <h2>Co-RL trains without labels and matches GRPO trained with them.</h2>
         <p class="lede">GT-Reward is the same recipe with the same models, data, and budget, plus the ground
           truth. Co-RL matches or surpasses it in <span class="num">11 of 14</span> settings, and matches or
-          beats TTRL in <span class="num">13 of 14</span>.</p>
+          beats TTRL in <span class="num">13 of 14</span>. Same family trains two agents initialized from the
+          same base model, Different family pairs one agent from each of two families, and Different family+
+          further decouples the training data.</p>
       </div>
       <figure class="media-card">
         <button class="media-button" type="button" data-lightbox="static/images/fig-results.png" aria-label="Enlarge the main results figure">
@@ -245,8 +247,9 @@
       </div>
 
       <h3 class="sub-head">Decoupled input formation</h3>
-      <p>The Different family+ runs train one agent on the original MATH prompt and the other on a DeepSeek-V3
-        rewrite. The rewrite recasts the problem in a new scenario and never changes the answer.</p>
+      <p>Different family+ adds the third channel. One agent trains on the original MATH prompt and the
+        other on a DeepSeek-V3 rewrite, so the pair no longer shares its training data. The rewrite recasts
+        the problem in a new scenario and never changes the answer.</p>
       <div class="pair-grid" aria-label="A rephrased training pair from the appendix">
         <div class="step-card"><span class="idx">ORIGINAL</span>
           <p>How many vertical asymptotes does the graph of y = 2/(x²+x−6) have?</p></div>
@@ -260,7 +263,7 @@
     <section id="benchmarks" class="section-shell section-block">
       <div class="section-head">
         <p class="eyebrow">05 / Benchmarks</p>
-        <h2>No single benchmark drives the gains.</h2>
+        <h2>The gains spread across all eleven benchmarks.</h2>
         <p class="lede">Pick a domain and a backbone to see the full table. Violet cells sit above the Base
           model and red cells below. Bold is the best label-free result and underline the second best, as in
           the paper.</p>
@@ -278,7 +281,6 @@
             <select id="results-backbone" aria-label="Choose a backbone"></select>
           </label>
         </div>
-        <div class="chart-wrap" id="results-ladder" aria-hidden="true"></div>
         <div class="data-table-wrap" id="results-table" aria-live="polite"></div>
         <div id="results-note"></div>
       </div>
@@ -286,13 +288,15 @@
       <div class="split flip">
         <div>
           <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
-          <p>The tables above show endpoints. The curves show the whole run at four scales, and several
-            self-rewarding runs collapse or diverge midway.</p>
-          <div class="read-chips read-chips-stack" aria-label="How to read the dynamics figure">
-            <span class="read-chip"><b>RENT</b> drives reward variation toward zero with sharp length increases</span>
-            <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
-            <span class="read-chip"><b>Co-RL</b> stays stable at all four scales</span>
-          </div>
+          <p>The tables above show endpoints. The curves show the whole run at four scales.</p>
+          <ul class="panel-keys">
+            <li><b>(a)</b>Several self-rewarding runs collapse or diverge midway. Co-RL and the labeled
+              reference hold their accuracy.</li>
+            <li><b>(b)</b>RENT drives the reward variation toward zero. Co-RL keeps it steady for the whole
+              run.</li>
+            <li><b>(c)</b>RENT shows sharp increases in completion length and Intuitor degenerates on some
+              models. Co-RL stays flat.</li>
+          </ul>
         </div>
         <figure class="media-card">
         <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
@@ -394,8 +398,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-15"></script>
-  <script src="static/data/results.js?v=20260819-15"></script>
-  <script src="static/js/site.js?v=20260819-15"></script>
+  <script src="static/data/content.js?v=20260819-16"></script>
+  <script src="static/data/results.js?v=20260819-16"></script>
+  <script src="static/js/site.js?v=20260819-16"></script>
 </body>
 </html>
