@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-16">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-17">
 </head>
 <body>
   <header class="site-header">
@@ -250,13 +250,19 @@
       <p>Different family+ adds the third channel. One agent trains on the original MATH prompt and the
         other on a DeepSeek-V3 rewrite, so the pair no longer shares its training data. The rewrite recasts
         the problem in a new scenario and never changes the answer.</p>
-      <div class="pair-grid" aria-label="A rephrased training pair from the appendix">
-        <div class="step-card"><span class="idx">ORIGINAL</span>
-          <p>How many vertical asymptotes does the graph of y = 2/(x²+x−6) have?</p></div>
-        <div class="step-card"><span class="idx">REPHRASED · DEEPSEEK-V3</span>
-          <p>The function f(t) = 2/(t²+t−6) describes the temperature of a chemical reaction over time t. How
-             many vertical asymptotes appear on the graph of this function? <em>Answer unchanged: 2.</em></p></div>
+      <div class="pair-flow" aria-label="A rephrased training pair from the appendix">
+        <div class="rp-card">
+          <span class="rp-tag">Original MATH prompt</span>
+          <p>How many vertical asymptotes does the graph of y&nbsp;=&nbsp;2/(x²+x−6) have?</p>
+        </div>
+        <div class="rp-arrow" aria-hidden="true"><span class="rp-circle">→</span><span class="rp-label">DeepSeek-V3<br>rewrite</span></div>
+        <div class="rp-card">
+          <span class="rp-tag">Rephrased</span>
+          <p>The function f(t)&nbsp;=&nbsp;2/(t²+t−6) describes the temperature of a chemical reaction over
+             time t. How many vertical asymptotes appear on the graph of this function?</p>
+        </div>
       </div>
+      <p class="answer-badge">Answer unchanged&nbsp;·&nbsp;<b>2</b></p>
     </section>
 
     <!-- ================= 05 BENCHMARKS ================= -->
@@ -307,11 +313,7 @@
           Runs marked diverged leave the plotted range. Click to enlarge.</figcaption>
       </figure>
       </div>
-      <div class="callout honesty">
-        <span class="tag">Stated plainly</span>
-        TTRL is the most stable self-rewarding baseline in this figure and the strongest on both 3B backbones.
-        At 7B and 8B, RENT and Co-rewarding-II post the strongest self-rewarding averages.
-      </div>
+
     </section>
 
     <!-- ================= 06 OBJECTIONS ================= -->
@@ -398,8 +400,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-16"></script>
-  <script src="static/data/results.js?v=20260819-16"></script>
-  <script src="static/js/site.js?v=20260819-16"></script>
+  <script src="static/data/content.js?v=20260819-17"></script>
+  <script src="static/data/results.js?v=20260819-17"></script>
+  <script src="static/js/site.js?v=20260819-17"></script>
 </body>
 </html>

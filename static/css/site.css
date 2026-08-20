@@ -157,6 +157,26 @@ code { font-family: var(--mono); font-size: .92em; }
 .pair-grid p { margin: 0; font-size: 14.5px; color: var(--ink); line-height: 1.6; }
 .pair-grid em { color: var(--muted); font-style: normal; font-size: 13px; }
 
+/* ---------- rephrase pair flow ---------- */
+.pair-flow { display: grid; grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr); align-items: stretch; margin: 22px 0 10px; }
+.rp-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; }
+.rp-card:first-child { border-top: 3px solid var(--gray-bar); }
+.rp-card:last-child { border-top: 3px solid var(--violet); }
+.rp-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 10px; }
+.rp-card:last-child .rp-tag { color: var(--violet-dark); }
+.rp-card p { margin: 0; font-family: var(--serif); font-size: 16.5px; line-height: 1.65; color: var(--ink); }
+.rp-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.rp-circle {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--violet-soft); color: var(--violet-dark);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600;
+}
+.rp-arrow .rp-label { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-align: center; line-height: 1.5; }
+.answer-badge {
+  text-align: center; margin: 14px 0 0; font-family: var(--mono); font-size: 12.5px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted);
+}
+.answer-badge b { color: var(--violet-dark); font-size: 15px; }
+
 /* ---------- finding rows (reference style) ---------- */
 .finding-list { display: flex; flex-direction: column; gap: 14px; margin: 26px 0 6px; }
 .finding-row { background: var(--card); border: 1px solid var(--line); border-left-width: 4px; border-radius: 4px; }
@@ -344,7 +364,9 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
   .panel { padding: 16px; }
     .dr-label { width: auto; flex: 1; }
   .dr-nums { width: auto; font-size: 12px; }
-  .pair-grid { grid-template-columns: minmax(0, 1fr); }
+  .pair-flow { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .rp-arrow { flex-direction: row; }
+  .rp-circle { transform: rotate(90deg); }
   .dr-nums em { display: inline; }
 }
 
