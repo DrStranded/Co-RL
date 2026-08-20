@@ -217,7 +217,7 @@ select {
 .vb-bar.tt { bottom: 3px; height: 8px; background: var(--blue); opacity: .85; }
 .vb-gt { position: absolute; top: -2px; bottom: -2px; width: 0; border-left: 2.5px dashed var(--ink); }
 .kb-track { flex: 1; position: relative; height: 15px; background: var(--paper); border-radius: 4px; overflow: hidden; }
-.kb-band { position: absolute; top: 0; bottom: 0; background: var(--amber-soft); }
+.kb-band { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, rgba(27, 34, 44, .08) 0 3px, transparent 3px 7px); }
 .kb-bar { position: absolute; left: 0; top: 2px; height: 11px; border-radius: 0 5px 5px 0; }
 .dr-nums { width: 210px; flex-shrink: 0; text-align: right; font-family: var(--mono); font-size: 13.5px; }
 .dr-nums .n-co { color: var(--violet-dark); font-weight: 500; }
@@ -265,6 +265,14 @@ select {
 .chart-wrap svg { width: 100%; height: auto; display: block; min-width: 620px; }
 #phase-diagram svg { min-width: 0; }
 .chart-note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+.stat-key { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 24px; }
+.stat-key > div { display: flex; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.stat-key b { font-family: var(--mono); font-size: 19px; color: var(--violet-dark); line-height: 1.2; }
+.stat-key span { font-size: 13.5px; color: #3c4450; line-height: 1.5; }
+.stat-key strong { color: var(--ink); }
+.rung-viz { margin-top: 14px; }
+.rung-viz .bar-label { width: 200px; }
 
 .contingency { border-collapse: collapse; font-size: 13.5px; margin: 14px 0; }
 .contingency th, .contingency td { border: 1px solid var(--line); padding: 7px 14px; text-align: center; }
@@ -410,6 +418,7 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
   .dr-label { width: auto; flex: 1; }
   .dr-nums { width: auto; font-size: 12px; }
   .vb-track, .kb-track { order: 3; flex-basis: 100%; }
+  .stat-key { grid-template-columns: minmax(0, 1fr); }
   .dr-nums em { display: inline; }
 }
 

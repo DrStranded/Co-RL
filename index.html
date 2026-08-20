@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-5">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-6">
 </head>
 <body>
   <header class="site-header">
@@ -90,42 +90,20 @@
           what humans can reliably evaluate.</p>
       </div>
       <div class="step-grid" aria-label="The problem in three statements">
-        <div class="step-card"><span class="idx">FACT 01</span>
-          <strong>Self-rewarding removes the labels</strong>
-          <p>The model grades itself. TTRL trusts its own majority vote, Intuitor its token-level confidence,
-             RENT its predictive entropy, and Co-rewarding-II the vote of a slowly updated copy of its own
-             weights.</p></div>
-        <div class="step-card"><span class="idx">FACT 02</span>
-          <strong>Every one of those signals is the policy grading itself</strong>
-          <p>Without an external reference, the model is rewarded for being confident, not for being right.
-             Whatever it already believes gets reinforced.</p></div>
-        <div class="step-card"><span class="idx">FACT 03</span>
-          <strong>Prolonged self-rewarding training can degenerate</strong>
-          <p>Responses homogenize, completion lengths degenerate, and some runs collapse or diverge outright.
-             The figure below shows it happening at four model scales.</p></div>
+        <div class="step-card"><span class="idx">01 · THE LABEL BILL</span>
+          <strong>Someone has to write the answer key</strong>
+          <p>Every training question needs a verified answer. Those answers are costly to produce, and the
+             frontier questions are exactly the ones humans can no longer check reliably.</p></div>
+        <div class="step-card"><span class="idx">02 · THE SHORTCUT</span>
+          <strong>Self-rewarding drops the labels and lets the model grade itself</strong>
+          <p>The reward comes from the model's own behavior: its majority vote (TTRL), its confidence
+             (Intuitor), its entropy (RENT), or agreement with a copy of itself (Co-rewarding).</p></div>
+        <div class="step-card"><span class="idx">03 · THE CATCH</span>
+          <strong>A model that grades itself is rewarded for confidence, not correctness</strong>
+          <p>Whatever it already believes gets reinforced. Prolonged training can homogenize responses,
+             degenerate, or collapse. Section 05 shows the training curves where this happens.</p></div>
       </div>
-      <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
-          <img src="static/images/fig-dynamics-4scale.png" width="2200" height="1579" loading="lazy"
-               alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
-        </button>
-        <figcaption>Training dynamics at four scales (Qwen2.5-3B, Llama-3.2-3B, Qwen2.5-7B, Llama-3.1-8B):
-          validation accuracy, within-group reward standard deviation, mean completion length. Runs marked
-          diverged leave the plotted range.</figcaption>
-      </figure>
-      <div class="read-chips" aria-label="How to read the dynamics figure">
-        <span class="read-chip"><b>RENT</b> drives reward std toward 0 with sharp increases in completion length</span>
-        <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
-        <span class="read-chip"><b>Co-RL</b> holds stable reward variation and completion lengths at all four scales</span>
-      </div>
-      <div class="callout honesty">
-        <span class="tag">Stated plainly</span>
-        TTRL is the most stable self-rewarding baseline in this figure, and the strongest self-rewarding row
-        on both 3B backbones. On Llama-3.2-3B-Instruct its 43.1 average even edges Co-RL (Same family) at
-        42.7. At 7B and 8B, RENT (52.8 on Qwen2.5-7B) and Co-rewarding-II (46.6 on Llama-3.1-8B-Instruct)
-        post the strongest self-rewarding averages. The failure of self-rewarding is degeneration or
-        saturation, not universal collapse.
-      </div>
+
     </section>
     </div>
 
@@ -246,10 +224,18 @@
         <tr><th>A correct</th><td>both correct</td><td>only A correct</td></tr>
         <tr><th>A wrong</th><td>only B correct</td><td class="hot">both wrong</td></tr>
       </table>
-      <p>The off-diagonal cells are where one model can correct the other; their share is complementarity
-        <em>c</em>. The dangerous corner is both-wrong-with-the-same-answer, wrong-agreement <em>w</em>: the
-        case a majority vote cannot detect. The overlap of the two error patterns is summarized by one number,
-        κ (Cohen's kappa). Lower κ means the two models fail on different problems.</p>
+      <p>Four numbers summarize a pair, and every one of them is a count over these four cells:</p>
+      <div class="stat-key" aria-label="What each statistic means">
+        <div><b>κ</b><span><strong>Error overlap.</strong> How often the two models' right-and-wrong patterns
+          coincide, beyond chance. 1 means they always fail together, 0 means their errors are unrelated.
+          Lower is better for co-training.</span></div>
+        <div><b>c</b><span><strong>Complementarity.</strong> The share of problems where exactly one model is
+          correct. This is the territory where a peer can correct a mistake. Higher is better.</span></div>
+        <div><b>w</b><span><strong>Wrong agreement.</strong> The share where both models are wrong with the
+          same answer. A majority vote cannot catch this case. Lower is better.</span></div>
+        <div><b>u</b><span><strong>At least one right.</strong> The share of problems outside the both-wrong
+          cell. Higher means more problems are recoverable by some member of the pair.</span></div>
+      </div>
 
       <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Bar chart of error overlap for the twelve model pairs, grouped by level: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty."></div>
 
@@ -330,6 +316,32 @@
           second best, exactly as marked in the paper. Base and GT-Reward are references, excluded from that
           ranking.</p>
         <div id="results-note"></div>
+      </div>
+
+      <h3 class="sub-head">The training curves behind the tables.</h3>
+      <p>Endpoint numbers can hide an unstable run. Tracking validation accuracy, reward variation, and
+        completion length across training shows which methods hold and which degenerate.</p>
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
+          <img src="static/images/fig-dynamics-4scale.png" width="2200" height="1579" loading="lazy"
+               alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
+        </button>
+        <figcaption>Training dynamics at four scales (Qwen2.5-3B, Llama-3.2-3B, Qwen2.5-7B, Llama-3.1-8B):
+          validation accuracy, within-group reward standard deviation, mean completion length. Runs marked
+          diverged leave the plotted range.</figcaption>
+      </figure>
+      <div class="read-chips" aria-label="How to read the dynamics figure">
+        <span class="read-chip"><b>RENT</b> drives reward std toward 0 with sharp increases in completion length</span>
+        <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
+        <span class="read-chip"><b>Co-RL</b> holds stable reward variation and completion lengths at all four scales</span>
+      </div>
+      <div class="callout honesty">
+        <span class="tag">Stated plainly</span>
+        TTRL is the most stable self-rewarding baseline in this figure, and the strongest self-rewarding row
+        on both 3B backbones. On Llama-3.2-3B-Instruct its 43.1 average even edges Co-RL (Same family) at
+        42.7. At 7B and 8B, RENT (52.8 on Qwen2.5-7B) and Co-rewarding-II (46.6 on Llama-3.1-8B-Instruct)
+        post the strongest self-rewarding averages. The failure of self-rewarding is degeneration or
+        saturation, not universal collapse.
       </div>
     </section>
 
@@ -469,8 +481,8 @@ cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-5"></script>
-  <script src="static/data/results.js?v=20260819-5"></script>
-  <script src="static/js/site.js?v=20260819-5"></script>
+  <script src="static/data/content.js?v=20260819-6"></script>
+  <script src="static/data/results.js?v=20260819-6"></script>
+  <script src="static/js/site.js?v=20260819-6"></script>
 </body>
 </html>

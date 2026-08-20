@@ -92,6 +92,38 @@
   }
 
   /* =============== LADDER =============== */
+  // Per-rung results, computed live from siteResults. Text rungs show the average
+  // gain over Base for that variant on all four backbones; the modality rung shows
+  // the vision-language gains; the seed-only rung shows the probe's overlap bars.
+  function rungViz(rung) {
+    const VIOLET = "#7b50a2", AMBER = "#d99e2f";
+    const gain = (b, method, dp) => {
+      const co = b.rows.find(r => r.method === method);
+      const base = rowBy(b.rows, "Base");
+      if (!co || !base) return null;
+      return "+" + (avgN(co) - avgN(base)).toFixed(dp);
+    };
+    if (rung.id === "seed") {
+      const items = R.decPool.filter(p => p.level === "seed only").map(p => (
+        { label: p.pair, value: p.kappa.toFixed(2), color: AMBER }));
+      return `<span class="rp-label">The four seed-only pairs, error overlap κ</span>` + barRows(items, 0.62) +
+        `<p class="chart-note">Full definitions of κ are above; these pairs exist as the capability control.</p>`;
+    }
+    if (rung.id === "modality") {
+      const items = [...R.vlmSmall, ...R.vlmLarge].map(b => {
+        const v = gain(b, b.rows.find(r => r.method.indexOf("Co-RL") === 0).method, 2);
+        return { label: b.backbone + " · " + b.dataset, value: v, color: VIOLET };
+      });
+      return `<span class="rp-label">Average gain over Base, four-benchmark multimodal suite</span>` + barRows(items);
+    }
+    const variant = { "same-family": "Co-RL (Same family)", "diff-family": "Co-RL (Different family)",
+                      "diff-data": "Co-RL (Different family+)" }[rung.id];
+    if (!variant) return "";
+    const items = R.llmMain.map(b => ({ label: b.backbone, value: gain(b, variant, 1), color: VIOLET }))
+                           .filter(it => it.value !== null);
+    return `<span class="rp-label">Average gain over Base, seven-benchmark text suite</span>` + barRows(items);
+  }
+
   function renderRungPanel(rung) {
     let html = `<span class="badge tone-${rung.badgeTone}">${esc(rung.badge)}</span>
       <h3>Rung ${esc(rung.index)}: ${esc(rung.label)}</h3>
@@ -99,6 +131,7 @@
       <span class="rp-label">Measured</span><p>${esc(rung.measured)}</p>
       <span class="rp-label">Trained</span><p>${esc(rung.trained)}</p>`;
     if (rung.result) html += `<span class="rp-label">Result</span><p>${esc(rung.result)}</p>`;
+    html += `<div class="rung-viz">${rungViz(rung)}</div>`;
     if (rung.rephrase) {
       html += `<div class="rephrase-toggle">
         <div class="rephrase-tabs" aria-label="Original or rephrased prompt">
@@ -135,9 +168,9 @@
   }
 
   /* =============== PROBE =============== */
-  const LEVEL_COLOR = { "different family": "#7b50a2", "same family": "#0072b2", "seed only": "#a9b2b9" };
+  const LEVEL_COLOR = { "different family": "#7b50a2", "same family": "#0072b2", "seed only": "#d99e2f" };
   // text needs AA contrast on white; the light gray stays for dots and bars only
-  const LEVEL_TEXT = { "different family": "#5d3a80", "same family": "#005c8f", "seed only": "#5f6a72" };
+  const LEVEL_TEXT = { "different family": "#5d3a80", "same family": "#005c8f", "seed only": "#8a6d1f" };
 
   function renderKappaStrip() {
     const XMAX = 0.62, B0 = 0.42, B1 = 0.51;
@@ -168,7 +201,11 @@
 
   function renderPoolTable() {
     let html = `<table class="data-table"><thead><tr>
-      <th>Pair</th><th>Level</th><th>κ ↓</th><th>c ↑ (%)</th><th>w ↓ (%)</th><th>u ↑ (%)</th></tr></thead><tbody>`;
+      <th>Pair</th><th>Level</th>
+      <th title="error overlap, lower is better">overlap κ ↓</th>
+      <th title="share where exactly one model is correct">complementarity c ↑ (%)</th>
+      <th title="share where both are wrong with the same answer">wrong agreement w ↓ (%)</th>
+      <th title="share where at least one model is correct">at least one right u ↑ (%)</th></tr></thead><tbody>`;
     let tier = null;
     R.decPool.forEach(p => {
       if (p.tier !== tier) { tier = p.tier; html += `<tr class="group-row"><td colspan="6">${esc(tier)}</td></tr>`; }
