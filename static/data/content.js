@@ -52,7 +52,7 @@ window.siteContent = {
       badge: "Co-RL (Same family)",
       badgeTone: "accent",
       what: "Two agents initialized from one lineage, across sizes or generations. Decoupled parameters and optimizer states, but a shared model stack.",
-      measured: "κ 0.51–0.52, complementarity 24.2–24.4% — indistinguishable from seed-only pairs.",
+      measured: "κ 0.51–0.52, complementarity 24.2–24.4%. Indistinguishable from seed-only pairs.",
       trained: "The readily accessible setting: no second model family needed.",
       result: "Already lifts the seven-benchmark average by 8.0% on Qwen2.5-3B and 4.0% on Llama-3.2-3B-Instruct over the base models."
     },
@@ -63,7 +63,7 @@ window.siteContent = {
       kappa: "κ 0.31–0.42",
       badge: "Co-RL (Different family)",
       badgeTone: "accent",
-      what: "Separate architectures, tokenizers, vocabularies, and pretraining corpora — e.g. Qwen2.5 × Llama 3. Every design choice made independently.",
+      what: "Separate architectures, tokenizers, vocabularies, and pretraining corpora, e.g. Qwen2.5 × Llama 3. Every design choice made independently.",
       measured: "κ 0.31–0.42, complementarity 29.4–32.8%. Every different-family pair sits below every same-family pair, with no overlap.",
       trained: "The main setting of the paper.",
       result: "Beats the strongest self-rewarding baseline on all four text backbones."
@@ -78,7 +78,7 @@ window.siteContent = {
       what: "One agent trains on the original MATH prompt, the other on a DeepSeek-V3 rewrite that preserves the answer and the sample order while recasting the problem into a different concrete scenario.",
       measured: "In a sample of 300 rewrite pairs, every rewrite preserved the answer and the row alignment.",
       trained: "The strongest label-free variant.",
-      result: "Best label-free average on all four text backbones. Caveat, stated plainly: the rewrite touches training prompts only and never supplies an answer — and rung 2, with no rewriting at all, already beats every self-rewarding baseline.",
+      result: "Best label-free average on all four text backbones. Caveat, stated plainly: the rewrite touches training prompts only and never supplies an answer. And rung 2, with no rewriting at all, already beats every self-rewarding baseline.",
       rephrase: {
         original: "How many vertical asymptotes does the graph of y = 2/(x\u00b2+x\u22126) have?",
         rephrased: "The function f(t) = 2/(t\u00b2+t\u22126) describes the temperature of a chemical reaction over time t. How many vertical asymptotes appear on the graph of this function?"
@@ -94,7 +94,7 @@ window.siteContent = {
       what: "Vision-language families differ in the vision encoder as well as the language backbone: Qwen2.5-VL pairs a natively trained dynamic-resolution ViT, InternVL adopts InternViT, Gemma 3 uses SigLIP.",
       measured: "The κ probe covers text base models only, so this rung is argued from architecture and confirmed downstream.",
       trained: "Trained with five vision-language models from 2B to 12B: the 2B\u20133B pair on both open-r1 and MMR1, the 7B\u201312B trio on open-r1.",
-      result: "Gains of 2.3–7.2% on the four-benchmark multimodal suite. No Different family+ variant exists for vision-language models — data decoupling has only been run on text."
+      result: "Gains of 2.3–7.2% on the four-benchmark multimodal suite. No Different family+ variant exists for vision-language models: data decoupling has only been run on text."
     }
   ],
 

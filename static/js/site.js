@@ -20,10 +20,9 @@
 
   /* =============== VERDICT SCOREBOARD =============== */
   // One chip per backbone/training-set block that carries a GT-Reward row.
-  // Values are read live from siteResults — nothing here is hand-typed.
+  // Values are read live from siteResults; nothing here is hand-typed.
   function verdictChips(dfOnly) {
     const chips = [];
-    // text blocks
     R.llmMain.forEach(b => {
       const gt = rowBy(b.rows, "GT-Reward");
       const cands = b.rows.filter(r => dfOnly ? r.method === "Co-RL (Different family)" : CO_VARIANTS.includes(r.method));
@@ -32,7 +31,6 @@
       chips.push({ domain: "text", model: b.backbone, meta: "text · 7-benchmark avg",
                    variant: best.method, ours: avgOf(best), gt: avgOf(gt) });
     });
-    // three-agent blocks (Different family by construction)
     R.n3.forEach(b => {
       const gt = rowBy(b.rows, "GT-Reward");
       const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
@@ -40,7 +38,6 @@
       chips.push({ domain: "text", model: b.model, meta: "text · three-agent ring · 7-benchmark avg",
                    variant: "Co-RL (Different family), N=3", ours: avgOf(co), gt: avgOf(gt) });
     });
-    // vision-language blocks (all Different family)
     [...R.vlmSmall, ...R.vlmLarge].forEach(b => {
       const gt = rowBy(b.rows, "GT-Reward");
       const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
@@ -85,7 +82,7 @@
   /* =============== LADDER =============== */
   function renderRungPanel(rung) {
     let html = `<span class="badge tone-${rung.badgeTone}">${esc(rung.badge)}</span>
-      <h3>Rung ${esc(rung.index)} — ${esc(rung.label)}</h3>
+      <h3>Rung ${esc(rung.index)}: ${esc(rung.label)}</h3>
       <p>${esc(rung.what)}</p>
       <span class="rp-label">Measured</span><p>${esc(rung.measured)}</p>
       <span class="rp-label">Trained</span><p>${esc(rung.trained)}</p>`;
@@ -135,7 +132,6 @@
     const W = 900, H = 210, L = 40, Rt = 30, axisY = 150;
     const xmin = 0.28, xmax = 0.62;
     const x = k => L + (k - xmin) / (xmax - xmin) * (W - L - Rt);
-    // shaded empty band between the max different-family kappa and min same/seed kappa
     const dfMax = Math.max(...pts.filter(p => p.level === "different family").map(p => p.kappa));
     const otMin = Math.min(...pts.filter(p => p.level !== "different family").map(p => p.kappa));
     let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="DM Mono, monospace">`;
@@ -146,8 +142,7 @@
       svg += `<line x1="${x(t)}" y1="${axisY}" x2="${x(t)}" y2="${axisY + 6}" stroke="#1b222c"/>`;
       svg += `<text x="${x(t)}" y="${axisY + 22}" text-anchor="middle" font-size="12" fill="#67707b">${t.toFixed(2)}</text>`;
     }
-    svg += `<text x="${W - Rt}" y="${axisY + 42}" text-anchor="end" font-size="12" fill="#67707b">Cohen's κ (lower = more decoupled errors)</text>`;
-    // jitter dots vertically per level to avoid overlap
+    svg += `<text x="${W - Rt}" y="${axisY + 42}" text-anchor="end" font-size="12" fill="#67707b">error overlap κ (lower = the two models fail on different problems)</text>`;
     const lanes = { "different family": 96, "same family": 116, "seed only": 140 };
     const seen = {};
     pts.forEach(p => {
@@ -159,7 +154,6 @@
       svg += `<circle cx="${x(p.kappa)}" cy="${cy}" r="7" fill="${LEVEL_COLOR[p.level]}" opacity="0.88">` +
              `<title>${esc(p.pair)} (${esc(p.tier)}): κ ${p.kappa}, c ${p.c}%, w ${p.w}%, u ${p.u}%</title></circle>`;
     });
-    // legend
     let lx = L;
     Object.keys(LEVEL_COLOR).forEach(lv => {
       svg += `<circle cx="${lx}" cy="16" r="6" fill="${LEVEL_COLOR[lv]}"/>`;
@@ -183,33 +177,6 @@
     $("#probe-pool-table").innerHTML = html;
   }
 
-  function renderAnchorCharts() {
-    const anchors = [...new Set(R.decAnchor.map(r => r.anchor))];
-    const html = anchors.map(a => {
-      const rows = R.decAnchor.filter(r => r.anchor === a);
-      const bars = rows.map(r => {
-        const w = (r.kappa / 0.6) * 100;
-        return `<tr><td style="text-align:left;font-family:var(--sans)">${esc(r.partner)}</td>
-          <td style="text-align:left;font-family:var(--sans);font-size:12.5px;color:${LEVEL_TEXT[r.level]}">${esc(r.level)}</td>
-          <td style="width:45%"><div style="background:${LEVEL_COLOR[r.level]};height:13px;border-radius:4px;width:${w}%"></div></td>
-          <td>${r.kappa.toFixed(2)}</td><td>${r.c.toFixed(1)}</td><td>${r.w.toFixed(1)}</td></tr>`;
-      }).join("");
-      return `<h3 style="font-size:15px;margin:22px 0 6px">Anchor: ${esc(a)} <span style="color:var(--muted);font-weight:400">— partner varies, capability fixed</span></h3>
-        <div class="data-table-wrap"><table class="data-table"><thead>
-        <tr><th>Partner</th><th>Level</th><th>κ (bar)</th><th>κ ↓</th><th>c ↑ (%)</th><th>w ↓ (%)</th></tr></thead>
-        <tbody>${bars}</tbody></table></div>`;
-    }).join("");
-    $("#anchor-charts").innerHTML = html;
-  }
-
-  function setupProbeTabs() {
-    $$(".tab-button").forEach(btn => btn.addEventListener("click", () => {
-      $$(".tab-button").forEach(b => { b.classList.remove("is-active"); b.setAttribute("aria-pressed", "false"); });
-      btn.classList.add("is-active"); btn.setAttribute("aria-pressed", "true");
-      $$(".tab-panel").forEach(p => p.hidden = p.id !== btn.dataset.tab);
-    }));
-  }
-
   /* =============== RESULTS EXPLORER =============== */
   function methodRowClass(m) {
     if (m === "Base" || m === "GT-Reward") return "ref-row";
@@ -217,7 +184,17 @@
     return "";
   }
 
+  // Cell color encodes the change against the Base row in the same column.
+  // Violet above Base, red below, alpha grows with the size of the move.
+  function heatColor(delta) {
+    const a = Math.min(Math.abs(delta) / 6, 1) * 0.42;
+    if (a < 0.03) return "";
+    return delta >= 0 ? `rgba(123,80,162,${a.toFixed(2)})` : `rgba(190,55,55,${a.toFixed(2)})`;
+  }
+
   function renderResultsTable(headers, rows, label) {
+    const base = rowBy(rows, "Base");
+    const baseVals = base ? base.vals.map(nf) : null;
     let html = `<table class="data-table" aria-label="${esc(label)}"><thead><tr><th>Method</th>`;
     headers.forEach((h, i) => html += `<th class="${i === headers.length - 1 ? "avg-col" : ""}">${esc(h)}</th>`);
     html += `</tr></thead><tbody>`;
@@ -226,7 +203,12 @@
       r.vals.forEach((v, i) => {
         const mk = r.marks[i] === "b" ? "mark-b" : r.marks[i] === "u" ? "mark-u" : "";
         const avg = i === r.vals.length - 1 ? " avg-col" : "";
-        html += `<td class="${mk}${avg}">${fmt(v)}</td>`;
+        let bg = "";
+        if (baseVals && r.method !== "Base") {
+          const col = heatColor(nf(v) - baseVals[i]);
+          if (col) bg = ` style="background:${col}"`;
+        }
+        html += `<td class="${mk}${avg}"${bg}>${fmt(v)}</td>`;
       });
       html += `</tr>`;
     });
@@ -264,29 +246,29 @@
       }
     });
     svg += `</svg>`;
-    return `<div>${svg}</div><p class="chart-note">Average over the suite. Dashed marks are references
-      (excluded from the label-free ranking).</p>`;
+    return `<div>${svg}</div><p class="chart-note">Average over the suite. Dashed marks are references,
+      excluded from the label-free ranking.</p>`;
   }
 
   const TEXT_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    On Qwen2.5-3B, Same family (48.7) edges Different family (48.5): the downstream ladder is directional,
+    On Qwen2.5-3B, Same family (48.7) edges Different family (48.5). The downstream ladder is directional,
     not monotone on every backbone, even though the pre-RL κ ladder is clean. What holds on all four text
     backbones: Different family beats the strongest self-rewarding baseline everywhere, and Different family+
-    posts the best label-free average everywhere (margin +0.8–2.0%).</div>`;
+    posts the best label-free average everywhere, by 0.8 to 2.0 points.</div>`;
   const VLM_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    On InternVL-3.5-2B with MMR1, TTRL's 45.30 average beats Co-RL's 45.15 — the one setting of four the small
-    pair loses. Base is graded once with the corrected multiple-choice grader, so it is identical across the
-    two training sets. MMR1 blocks use the corrected grader and open-r1 blocks the legacy grader: the two are
-    never compared with each other.</div>
+    On InternVL-3.5-2B with MMR1, TTRL's 45.30 average beats Co-RL's 45.15. That is the one setting of four
+    the small pair loses. Base is graded once with the corrected multiple-choice grader, so it is identical
+    across the two training sets. MMR1 blocks use the corrected grader and open-r1 blocks the legacy grader,
+    and the two are never compared with each other.</div>
     <p class="chart-note">Vision-language families pair different encoders with different backbones:
     Qwen2.5-VL uses a natively trained dynamic-resolution ViT, InternVL uses InternViT, Gemma 3 uses SigLIP.
-    At 7B–12B (InternVL3.5-8B as the shared partner): +7.2% Qwen2.5-VL-7B, +6.3% InternVL3.5-8B,
-    +5.8% Gemma-3-12B over base — beating TTRL for all three, and on Gemma-3-12B beating the labeled
-    reference outright (47.56 vs 45.17).</p>`;
+    At 7B to 12B, with InternVL3.5-8B as the shared partner, Co-RL improves the base models by 7.2%, 6.3%,
+    and 5.8%, beats TTRL for all three families, and on Gemma-3-12B beats the labeled reference outright
+    (47.56 vs 45.17).</p>`;
   const N3_NOTE = `<div class="callout"><span class="tag">One run, three improved models</span>
-    Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B trained together along the directed ring: average gains
-    of +7.8, +6.0, and +8.2 over base, each agent matching or outperforming its own labeled reference.
-    Rows are per-agent — do not read them against the two-agent tables.</div>`;
+    Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B trained together along the directed ring, with average
+    gains of 7.8, 6.0, and 8.2 points over base. Each agent matches or outperforms its own labeled reference.
+    Rows are per-agent, so do not read them against the two-agent tables.</div>`;
 
   function resultsOptions(domain) {
     if (domain === "text") return R.llmMain.map((b, i) => ({ v: String(i), label: b.backbone + " (" + b.tier + ")" }));
@@ -327,119 +309,119 @@
     fill(); renderResults();
   }
 
-  /* =============== CONTROLS CARDS =============== */
-  function miniTable(rows, cols) {
-    let h = `<table class="mini-table">`;
-    rows.forEach(r => {
-      h += `<tr><td>${esc(r[0])}</td>` + r.slice(1).map(v => `<td>${esc(v)}</td>`).join("") + `</tr>`;
-    });
-    return h + `</table>`;
+  /* =============== OBJECTIONS CARDS =============== */
+  // Evidence bars in the reference page's style: label, track, printed value.
+  // Bars start at zero, so ranking is visual and precision stays in the number.
+  function barRows(items, maxHint) {
+    const max = maxHint || Math.max(...items.map(it => nf(it.value))) * 1.06;
+    return `<div class="bar-rows">` + items.map(it => {
+      const w = (nf(it.value) / max * 100).toFixed(1);
+      return `<div class="bar-row">
+        <span class="bar-label">${esc(it.label)}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${w}%;background:${it.color}"></span></span>
+        <span class="bar-value">${fmt(it.value)}</span></div>`;
+    }).join("") + `</div>`;
   }
 
+  const BLUE = "#0072b2", VIOLET = "#7b50a2", GRAY = "#a9b2b9";
+
   function renderControls() {
-    const eLL = R.ensLLM, gv = (setting) => avgOf(eLL.find(r => r.setting === setting));
+    const eLL = R.ensLLM, gv = s => avgOf(eLL.find(r => r.setting === s));
     const eV = (g, s) => avgOf(R.ensVLM.find(r => r.group === g && r.setting === s));
     const comAvg = m => avgOf(R.comas.rows.find(r => r.method === m));
     const n3gain = R.n3.map(b => (avgN(b.rows.find(r => r.method.indexOf("Co-RL") === 0)) - avgN(rowBy(b.rows, "Base"))).toFixed(1));
 
+    const ensBars = barRows([
+      { label: "TTRL · Qwen2.5-3B", value: gv("TTRL (Qwen2.5-3B)"), color: BLUE },
+      { label: "TTRL · Llama-3.2-3B", value: gv("TTRL (Llama-3.2-3B)"), color: BLUE },
+      { label: "TTRL · ensemble", value: gv("TTRL (ensemble)"), color: BLUE },
+      { label: "Co-RL · Qwen2.5-3B", value: gv("Co-RL (Qwen2.5-3B)"), color: VIOLET },
+      { label: "Co-RL · Llama-3.2-3B", value: gv("Co-RL (Llama-3.2-3B)"), color: VIOLET },
+      { label: "Co-RL · ensemble", value: gv("Co-RL (ensemble)"), color: VIOLET },
+    ]);
+    const comasBars = barRows([
+      { label: "Base", value: comAvg("Base"), color: GRAY },
+      { label: "MAPoRL", value: comAvg("MAPoRL"), color: BLUE },
+      { label: "TTRL", value: comAvg("TTRL"), color: BLUE },
+      { label: "CoMAS", value: comAvg("CoMAS"), color: BLUE },
+      { label: "Co-RL (Different family)", value: comAvg("Co-RL (Different family)"), color: VIOLET },
+    ]);
+    const n3Bars = barRows(R.n3.flatMap(b => [
+      { label: b.model + " · base", value: avgOf(rowBy(b.rows, "Base")), color: GRAY },
+      { label: b.model + " · Co-RL", value: avgOf(b.rows.find(r => r.method.indexOf("Co-RL") === 0)), color: VIOLET },
+      { label: b.model + " · GT-Reward", value: avgOf(rowBy(b.rows, "GT-Reward")), color: BLUE },
+    ]));
+
     $("#controls-cards").innerHTML = `
       <div class="control-card">
-        <p class="eyebrow">Control 1 · Matched budget</p>
-        <h3>Same two models, same rollouts — trained with TTRL instead</h3>
+        <p class="eyebrow">Objection 1 · You trained two models</p>
+        <h3>Train the same two models with TTRL instead, and the gain does not appear.</h3>
         <div class="big-num">${fmt(gv("Co-RL (ensemble)"))} <small>vs ${fmt(gv("TTRL (ensemble)"))} · text maj@8</small></div>
-        <p>The same two base models are trained independently with TTRL; at inference both methods pool four
+        <p>The same two base models are trained independently with TTRL. At inference both methods pool four
            rollouts from each model for majority voting, matching the training-model and test-time budgets.
-           The individual agents stay visible — the weaker partner is the one that moves:</p>
-        ${miniTable([
-          ["TTRL — Qwen2.5-3B", fmt(gv("TTRL (Qwen2.5-3B)"))],
-          ["TTRL — Llama-3.2-3B", fmt(gv("TTRL (Llama-3.2-3B)"))],
-          ["TTRL — ensemble", fmt(gv("TTRL (ensemble)"))],
-          ["Co-RL — Qwen2.5-3B", fmt(gv("Co-RL (Qwen2.5-3B)"))],
-          ["Co-RL — Llama-3.2-3B", fmt(gv("Co-RL (Llama-3.2-3B)"))],
-          ["Co-RL — ensemble", fmt(gv("Co-RL (ensemble)"))]])}
+           The weaker partner is the one that moves:</p>
+        ${ensBars}
         <p>Multimodal, blocks kept apart: ${fmt(eV("open-r1", "Co-RL (ensemble)"))} vs
-           ${fmt(eV("open-r1", "TTRL (ensemble)"))} on open-r1;
+           ${fmt(eV("open-r1", "TTRL (ensemble)"))} on open-r1, and
            ${fmt(eV("MMR1", "Co-RL (ensemble)"))} vs ${fmt(eV("MMR1", "TTRL (ensemble)"))} on MMR1.
-           \u201c\u2026the advantage of Co-RL cannot be explained merely by training two models.\u201d</p>
-        <p class="src-note">Protocol: GSM8K, MATH-500, AMC at maj@8, T = 0.6 — a different evaluation regime
-          from the seven-benchmark tables, never mixed with them.</p>
+           In the paper's words, “…the advantage of Co-RL cannot be explained merely by training two
+           models.”</p>
+        <p class="src-note">Protocol: GSM8K, MATH-500, AMC at maj@8, T = 0.6. This is a different evaluation
+          regime from the seven-benchmark tables and is never mixed with them.</p>
       </div>
       <div class="control-card">
-        <p class="eyebrow">Control 2 · Versus multi-agent RL</p>
-        <h3>CoMAS's own setup, half the agents, no judge</h3>
+        <p class="eyebrow">Objection 2 · Multi-agent RL already does this</p>
+        <h3>Under CoMAS's own setup, Co-RL wins with half the agents and no judge.</h3>
         <div class="big-num">${fmt(comAvg("Co-RL (Different family)"))} <small>vs ${fmt(comAvg("CoMAS"))} avg</small></div>
-        <p>Under CoMAS's setup, official implementation, and evaluation protocol (prior rows quoted from
-           their paper): Co-RL leads five of the seven benchmarks and the average — using half as many
-           agents, with no LLM judge and no learned reward model.</p>
-        ${miniTable([
-          ["Base", fmt(comAvg("Base"))],
-          ["MAPoRL", fmt(comAvg("MAPoRL"))],
-          ["TTRL", fmt(comAvg("TTRL"))],
-          ["CoMAS", fmt(comAvg("CoMAS"))],
-          ["Co-RL (Different family)", fmt(comAvg("Co-RL (Different family)"))]])}
+        <p>Same setup, official implementation, and evaluation protocol as CoMAS, with prior rows quoted from
+           their paper. Co-RL leads five of the seven benchmarks and the average, with no LLM judge and no
+           learned reward model.</p>
+        ${comasBars}
         <p class="src-note">Caveat that travels with this claim: CoMAS's coding aggregation admits a
-          pass@5-vs-pass@1 loophole (worth 7.3% to the untrained baseline, 2.4% to Co-RL); the authors keep
-          the five-sample budget but replace the aggregation with majority voting over candidates clustered
-          by execution behavior. This table's suite and graders are CoMAS's — its numbers never share an
-          axis with the seven-benchmark tables.</p>
+          pass@5-versus-pass@1 loophole, worth 7.3% to the untrained baseline and 2.4% to Co-RL. The authors
+          keep the five-sample budget but replace the aggregation with majority voting over candidates
+          clustered by execution behavior. This table's suite and graders are CoMAS's, and its numbers never
+          share an axis with the seven-benchmark tables.</p>
       </div>
       <div class="control-card">
-        <p class="eyebrow">Control 3 · Three agents</p>
-        <h3>One ring, three models, three wins</h3>
+        <p class="eyebrow">Objection 3 · Does it scale past two agents?</p>
+        <h3>One ring trains three models at once, and all three improve.</h3>
         <div class="big-num">+${n3gain[0]} / +${n3gain[1]} / +${n3gain[2]} <small>avg gains over base</small></div>
         <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B trained together in a single run along the
-           directed ring — models of different families <em>and</em> sizes. Each agent matches or outperforms
-           its own labeled reference, and beats TTRL on the two 3B models while tying it on Qwen3-1.7B.</p>
-        ${miniTable(R.n3.map(b => [b.model,
-          "base " + fmt(avgOf(rowBy(b.rows, "Base"))),
-          "Co-RL " + fmt(avgOf(b.rows.find(r => r.method.indexOf("Co-RL") === 0))),
-          "GT " + fmt(avgOf(rowBy(b.rows, "GT-Reward")))]))}
-        <p class="src-note">Same training configuration as the two-agent language runs; full per-benchmark
-          rows in the Benchmarks explorer under "Three agents".</p>
+           directed ring: models of different families and sizes. Each agent matches or outperforms its own
+           labeled reference, and beats TTRL on the two 3B models while tying it on Qwen3-1.7B.</p>
+        ${n3Bars}
+        <p class="src-note">Same training configuration as the two-agent language runs. Full per-benchmark
+          rows are in the Benchmarks explorer under Three agents.</p>
       </div>`;
   }
 
   /* =============== THEORY PHASE DIAGRAM =============== */
   function renderPhaseDiagram() {
-    const S = 340, M = 44, P = S - 2 * M; // plot square
+    const S = 340, M = 44, P = S - 2 * M;
     const px = v => M + v * P, py = v => S - M - v * P;
     let svg = `<svg viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg" font-family="DM Mono, monospace">`;
-    // basins
     svg += `<polygon points="${px(0)},${py(1)} ${px(1)},${py(1)} ${px(1)},${py(0)}" fill="#ece4f3"/>`;
     svg += `<polygon points="${px(0)},${py(1)} ${px(0)},${py(0)} ${px(1)},${py(0)}" fill="#f7e4e4"/>`;
-    // frame
     svg += `<rect x="${M}" y="${M}" width="${P}" height="${P}" fill="none" stroke="#1b222c" stroke-width="1.5"/>`;
-    // separatrix
     svg += `<line x1="${px(0)}" y1="${py(1)}" x2="${px(1)}" y2="${py(0)}" stroke="#1b222c" stroke-width="1.5" stroke-dasharray="6 4"/>`;
-    svg += `<text x="${px(0.56)}" y="${py(0.56)}" font-size="10.5" fill="#1b222c" transform="rotate(-45 ${px(0.56)} ${py(0.56)})">p_A + p_B = 1</text>`;
-    // basin labels
-    svg += `<text x="${px(0.63)}" y="${py(0.82)}" font-size="11" fill="#5d3a80" text-anchor="middle">→ (1,1) correct</text>`;
-    svg += `<text x="${px(0.32)}" y="${py(0.16)}" font-size="11" fill="#be3737" text-anchor="middle">→ (0,0) wrong</text>`;
-    // fixed points
-    svg += `<circle cx="${px(1)}" cy="${py(1)}" r="6" fill="#147832"/><text x="${px(1) - 10}" y="${py(1) - 8}" font-size="10.5" text-anchor="end" fill="#147832">(1,1) stable</text>`;
-    svg += `<circle cx="${px(0)}" cy="${py(0)}" r="6" fill="#be3737"/><text x="${px(0) + 10}" y="${py(0) + 14}" font-size="10.5" fill="#be3737">(0,0) stable</text>`;
-    svg += `<circle cx="${px(0.5)}" cy="${py(0.5)}" r="5.5" fill="#fff" stroke="#1b222c" stroke-width="2"/><text x="${px(0.5) + 9}" y="${py(0.5) + 14}" font-size="10.5" fill="#1b222c">saddle (½,½)</text>`;
-    // worked example points
+    svg += `<text x="${px(0.30)}" y="${py(0.66)}" font-size="10.5" fill="#1b222c" text-anchor="middle" transform="rotate(-45 ${px(0.30)} ${py(0.66)})">chances sum to 1</text>`;
+    svg += `<text x="${px(0.63)}" y="${py(0.86)}" font-size="11" fill="#5d3a80" text-anchor="middle">end up right together</text>`;
+    svg += `<text x="${px(0.32)}" y="${py(0.13)}" font-size="11" fill="#be3737" text-anchor="middle">end up wrong together</text>`;
+    svg += `<circle cx="${px(1)}" cy="${py(1)}" r="6" fill="#5d3a80"/><text x="${px(1) - 10}" y="${py(1) - 8}" font-size="10.5" text-anchor="end" fill="#5d3a80">both right, stable</text>`;
+    svg += `<circle cx="${px(0)}" cy="${py(0)}" r="6" fill="#be3737"/><text x="${px(0) + 10}" y="${py(0) + 14}" font-size="10.5" fill="#be3737">both wrong, stable</text>`;
+    svg += `<circle cx="${px(0.5)}" cy="${py(0.5)}" r="5.5" fill="#fff" stroke="#1b222c" stroke-width="2"/><text x="${px(0.5) + 9}" y="${py(0.5) + 14}" font-size="10.5" fill="#1b222c">tipping point</text>`;
     [[0.9, 0.2], [0.2, 0.9]].forEach(pt => {
       svg += `<circle cx="${px(pt[0])}" cy="${py(pt[1])}" r="5" fill="#7b50a2"/>`;
       svg += `<text x="${px(pt[0]) + (pt[0] > 0.5 ? -8 : 8)}" y="${py(pt[1]) - 8}" font-size="10.5" fill="#5d3a80" text-anchor="${pt[0] > 0.5 ? "end" : "start"}">(${pt[0]}, ${pt[1]})</text>`;
     });
-    // axes labels
-    svg += `<text x="${px(0.5)}" y="${S - 8}" font-size="11" text-anchor="middle" fill="#67707b">p_A — P(agent A correct)</text>`;
-    svg += `<text x="12" y="${py(0.5)}" font-size="11" text-anchor="middle" fill="#67707b" transform="rotate(-90 12 ${py(0.5)})">p_B — P(agent B correct)</text>`;
+    svg += `<text x="${px(0.5)}" y="${S - 8}" font-size="11" text-anchor="middle" fill="#67707b">chance agent A is right</text>`;
+    svg += `<text x="12" y="${py(0.5)}" font-size="11" text-anchor="middle" fill="#67707b" transform="rotate(-90 12 ${py(0.5)})">chance agent B is right</text>`;
     svg += `</svg>`;
     $("#phase-diagram").innerHTML = svg;
   }
 
   /* =============== FURNITURE =============== */
-  function setupAccordions() {
-    $$(".acc-toggle").forEach(btn => btn.addEventListener("click", () => {
-      const item = btn.closest(".acc-item");
-      const open = item.classList.toggle("is-open");
-      btn.setAttribute("aria-expanded", open);
-    }));
-  }
-
   function setupLightbox() {
     const box = $("#lightbox"), img = $("#lightbox-image"), closeBtn = $("#lightbox-close");
     let lastTrigger = null;
@@ -490,12 +472,9 @@
     setupLadder();
     renderKappaStrip();
     renderPoolTable();
-    renderAnchorCharts();
-    setupProbeTabs();
     setupResults();
     renderControls();
     renderPhaseDiagram();
-    setupAccordions();
     setupLightbox();
     setupNav();
     setupBibtex();
