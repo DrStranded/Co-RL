@@ -100,22 +100,12 @@ code { font-family: var(--mono); font-size: .92em; }
 .button:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .button-dark { background: var(--ink); color: var(--paper); }
 .button-light { background: transparent; color: var(--ink); }
-.stat-strip {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
-  max-width: 980px; margin: 0 auto;
-}
-.stat-chip {
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-  padding: 18px 20px; text-align: left;
-}
-.stat-chip strong { font-family: var(--mono); font-size: 23px; font-weight: 500; color: var(--violet-dark); display: block; margin-bottom: 6px; }
-.stat-chip span { font-size: 13.5px; color: var(--muted); line-height: 1.5; display: block; }
 
 /* ---------- hover micro-interactions ---------- */
-.stat-chip, .step-card, .contrast-cell, .control-card {
+.step-card, .contrast-cell, .control-card {
   transition: transform .18s ease, box-shadow .18s ease;
 }
-.stat-chip:hover, .step-card:hover, .contrast-cell:hover, .control-card:hover {
+.step-card:hover, .contrast-cell:hover, .control-card:hover {
   transform: translateY(-2px); box-shadow: var(--shadow);
 }
 .media-card { transition: box-shadow .2s ease; overflow: hidden; }
@@ -351,8 +341,7 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 }
 @media (max-width: 680px) {
   body { font-size: 15.5px; }
-  .stat-strip { grid-template-columns: 1fr; }
-  .nav-toggle { display: block; }
+    .nav-toggle { display: block; }
   .nav-links {
     display: none; position: absolute; top: 58px; left: 0; right: 0;
     background: var(--paper); border-bottom: 1px solid var(--line);
