@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-8">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-9">
 </head>
 <body>
   <header class="site-header">
@@ -29,8 +29,8 @@
         <a href="#verdict">Results</a>
         <a href="#why">Why it works</a>
         <a href="#benchmarks">Benchmarks</a>
-        <a href="#objections">Objections</a>
-        <a href="#resources">Run it</a>
+        <a href="#objections">Ablations</a>
+        <a href="#resources">Code</a>
         <a href="#bibtex">BibTeX</a>
       </div>
     </nav>
@@ -85,8 +85,8 @@
         <p class="eyebrow">01 / The problem</p>
         <h2>Labels made RL for reasoning work. Labels are also its bottleneck.</h2>
         <p class="lede">Reinforcement learning with verifiable rewards is the standard route to stronger
-          reasoning, and it needs a verified answer for every training prompt. Those answers are costly to
-          produce and grow scarce as target capabilities pass what humans can reliably evaluate.</p>
+          reasoning. It needs a verified answer for every training prompt. Labels are expensive, and the
+          hardest problems are the ones humans can no longer check.</p>
       </div>
       <div class="step-grid" aria-label="The problem in three statements">
         <div class="step-card"><span class="idx">01 · VERIFIABLE REWARDS</span>
@@ -152,32 +152,24 @@
     <section id="verdict" class="section-shell section-block">
       <div class="section-head">
         <p class="eyebrow">03 / The result</p>
-        <h2>Trained with zero labels, it matches training with the labels.</h2>
-        <p class="lede">The hardest comparison for a label-free method is the same recipe trained on the real
-          answers. GT-Reward holds the models, data, and budget fixed and adds the ground truth. Co-RL matches
-          or surpasses it in <span class="num">11 of 14</span> settings and matches or beats TTRL in <span class="num">13 of 14</span>.</p>
+        <h2>Co-RL trains without labels and matches GRPO trained with them.</h2>
+        <p class="lede">GT-Reward is the same recipe with the same models, data, and budget, plus the ground
+          truth. Co-RL matches or surpasses it in <span class="num">11 of 14</span> settings, and matches or
+          beats TTRL in <span class="num">13 of 14</span>.</p>
       </div>
-      <div class="panel">
-        <div class="controls-row">
-          <label>Domain
-            <select id="verdict-domain" aria-label="Filter by domain">
-              <option value="all">All</option>
-              <option value="text">Text</option>
-              <option value="vlm">Vision-language</option>
-            </select>
-          </label>
-          <button class="toggle-button" id="verdict-df-only" type="button" aria-pressed="false">Different family only</button>
-        </div>
-        <p class="axis-title">Average gain over the Base model (%) ·
-          <span class="lg lg-co">Co-RL</span> · <span class="lg lg-tt">TTRL</span> ·
-          <span class="lg lg-gt">GT-Reward labeled reference</span></p>
-        <div id="verdict-chart" aria-live="polite"></div>
-        <p class="scope-note">
-          Apart from AMC, every number is a single run evaluated single-sample. Settings where Co-RL falls
-          below the reference are never hidden. MMR1 rows use the corrected multiple-choice grader and
-          open-r1 rows the legacy grader, so the two are never compared with each other.
-        </p>
-      </div>
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-results.png" aria-label="Enlarge the main results figure">
+          <img src="static/images/fig-results.png" width="2230" height="1867"
+               alt="Average gain over the Base model for every setting: Co-RL and TTRL as paired bars, GT-Reward as a dashed reference tick. Panels: text two-agent pairs, text three-agent ring, vision-language.">
+        </button>
+        <figcaption>Average gain over the Base model on each setting's benchmark suite (%). Dashed ticks are
+          GT-Reward, the labeled reference. Click to enlarge.</figcaption>
+      </figure>
+      <p class="scope-note">
+        Apart from AMC, every number is a single run evaluated single-sample. Settings where Co-RL falls
+        below the reference are shown as they are. MMR1 rows use the corrected multiple-choice grader and
+        open-r1 rows the legacy grader, so the two are never compared with each other.
+      </p>
     </section>
 
     <!-- ================= 04 WHY IT WORKS ================= -->
@@ -230,10 +222,10 @@
     <section id="benchmarks" class="section-shell section-block">
       <div class="section-head">
         <p class="eyebrow">05 / Benchmarks</p>
-        <h2>The averages hold benchmark by benchmark.</h2>
-        <p class="lede">The explorer opens the averages into seven text and four multimodal benchmarks. Cell
-          color is the change against the Base row in the same column, violet above and red below. Bold marks
-          the best label-free result and underline the second best, as in the paper.</p>
+        <h2>No single benchmark drives the gains.</h2>
+        <p class="lede">Pick a domain and a backbone to see the full table. Violet cells sit above the Base
+          model and red cells below. Bold is the best label-free result and underline the second best, as in
+          the paper.</p>
       </div>
       <div class="panel">
         <div class="controls-row">
@@ -253,8 +245,9 @@
         <div id="results-note"></div>
       </div>
 
-      <h3 class="sub-head">The training curves behind the tables</h3>
-      <p>Endpoint tables can hide an unstable run.</p>
+      <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
+      <p>The tables above show endpoints. The curves below show the whole run at four scales, and several
+        self-rewarding runs collapse or diverge midway.</p>
       <figure class="media-card">
         <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
           <img src="static/images/fig-dynamics-4scale.png" width="2200" height="1579" loading="lazy"
@@ -278,31 +271,45 @@
     <!-- ================= 06 OBJECTIONS ================= -->
     <section id="objections" class="section-shell section-block">
       <div class="section-head">
-        <p class="eyebrow">06 / Objections</p>
-        <h2>The three obvious objections have controlled answers.</h2>
+        <p class="eyebrow">06 / Ablations</p>
+        <h2>Three deeper ablations</h2>
       </div>
-      <div class="cards-3" id="controls-cards"></div>
+      <div class="cards-3">
+        <div class="control-card">
+          <p class="eyebrow">Matched training and inference budgets</p>
+          <h3>Ensembling two TTRL models does not close the gap</h3>
+          <p>The same two base models are trained with TTRL and ensembled the same way, maj@8 on GSM8K,
+             MATH-500, and AMC.</p>
+          <img src="static/images/fig-abl-ensemble.png" width="1041" height="583" loading="lazy" class="card-fig"
+               alt="Dot plot of macro-average maj@8 scores: TTRL ensemble scores below its best single model, Co-RL ensemble scores above both of its members.">
+        </div>
+        <div class="control-card">
+          <p class="eyebrow">Comparison with multi-agent RL</p>
+          <h3>Co-RL beats CoMAS under CoMAS's own protocol</h3>
+          <p>Same setup, official implementation, and graders, with prior rows quoted from their paper. Half
+             the agents, no LLM judge.</p>
+          <img src="static/images/fig-abl-comas.png" width="1042" height="523" loading="lazy" class="card-fig"
+               alt="Dot plot of seven-benchmark averages under the CoMAS protocol: Base 56.92, MAPoRL 58.22, TTRL 58.18, CoMAS 58.94, Co-RL 62.97.">
+        </div>
+        <div class="control-card">
+          <p class="eyebrow">Scaling to three agents</p>
+          <h3>One ring trains three models, and all three improve</h3>
+          <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together. Each agent matches or beats
+             its own labeled reference.</p>
+          <img src="static/images/fig-abl-n3.png" width="1035" height="483" loading="lazy" class="card-fig"
+               alt="Dumbbell plot from Base to Co-RL for the three ring-trained models, with dashed GT-Reward ticks: gains of 7.8, 6.0, and 8.2 points.">
+        </div>
+      </div>
     </section>
 
     <!-- ================= 07 RUN IT ================= -->
     <section id="resources" class="section-shell section-block">
       <div class="section-head">
-        <p class="eyebrow">07 / Run it</p>
-        <h2>Every setting on this page is one launcher away.</h2>
-        <p class="lede">The release is Apache-2.0 and ships the baselines next to the method. The exact paper
-          configuration is documented in the repository.</p>
-      </div>
-      <div class="code-block" aria-label="Quickstart and launchers">
-<pre><span class="c"># quickstart</span>
-git clone https://github.com/DrStranded/Co-RL &amp;&amp; cd Co-RL/llm
-pip install -r requirements.txt &amp;&amp; python tools/verify.py
-
-<span class="c"># the settings, as launchers. Swap MODEL_A / MODEL_B to move between them.</span>
-bash examples/ttrl_qwen25_1p5b.sh                                <span class="c"># baseline: TTRL</span>
-bash examples/same_family_qwen25_1p5b.sh                         <span class="c"># Co-RL (Same family)</span>
-bash examples/different_family_qwen25_1p5b_x_llama32_1b.sh       <span class="c"># Co-RL (Different family)</span>
-bash examples/n3_ring_qwen25_1p5b_x_llama32_1b_x_qwen3_0p6b.sh   <span class="c"># three-agent ring</span>
-cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.sh  <span class="c"># vision-language</span></pre>
+        <p class="eyebrow">07 / Code</p>
+        <h2>The code is public.</h2>
+        <p class="lede">The release is Apache-2.0. Every setting on this page has a launcher in
+          <a href="https://github.com/DrStranded/Co-RL" target="_blank" rel="noreferrer">the repository</a>,
+          with the baselines beside the method.</p>
       </div>
 
       <div class="bibtex-block" id="bibtex">
@@ -338,8 +345,8 @@ cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-8"></script>
-  <script src="static/data/results.js?v=20260819-8"></script>
-  <script src="static/js/site.js?v=20260819-8"></script>
+  <script src="static/data/content.js?v=20260819-9"></script>
+  <script src="static/data/results.js?v=20260819-9"></script>
+  <script src="static/js/site.js?v=20260819-9"></script>
 </body>
 </html>

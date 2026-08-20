@@ -16,85 +16,9 @@
   const avgOf = row => row.vals[row.vals.length - 1];
   const avgN = row => nf(avgOf(row));
   const rowBy = (rows, name) => rows.find(r => r.method === name);
-  const CO_VARIANTS = ["Co-RL (Same family)", "Co-RL (Different family)", "Co-RL (Different family+)"];
-
-  /* =============== VERDICT SCOREBOARD =============== */
-  // One chip per backbone/training-set block that carries a GT-Reward row.
-  // Values are read live from siteResults; nothing here is hand-typed.
-  function verdictChips(dfOnly) {
-    const chips = [];
-    R.llmMain.forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
-      const cands = b.rows.filter(r => dfOnly ? r.method === "Co-RL (Different family)" : CO_VARIANTS.includes(r.method));
-      if (!gt || !base || !cands.length) return;
-      const best = cands.reduce((a, r) => avgN(r) > avgN(a) ? r : a);
-      chips.push({ domain: "text", model: b.backbone, meta: "text · 7-benchmark avg",
-                   variant: best.method, ours: avgOf(best), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
-    });
-    R.n3.forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
-      const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
-      if (!gt || !base || !co) return;
-      chips.push({ domain: "text", model: b.model, meta: "text · three-agent ring · 7-benchmark avg",
-                   variant: "Co-RL (Different family), N=3", ours: avgOf(co), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
-    });
-    [...R.vlmSmall, ...R.vlmLarge].forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
-      const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
-      if (!gt || !base || !co) return;
-      chips.push({ domain: "vlm", model: b.backbone, meta: "multimodal · " + b.dataset + " · 4-benchmark avg",
-                   variant: co.method, ours: avgOf(co), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
-    });
-    return chips;
-  }
-
-  function renderVerdict() {
-    const domain = $("#verdict-domain").value;
-    const dfOnly = $("#verdict-df-only").classList.contains("is-active");
-    const chips = verdictChips(dfOnly).filter(c => domain === "all" || c.domain === domain);
-    const groups = [
-      { name: "Text · two-agent pairs", rows: chips.filter(c => c.domain === "text" && c.meta.indexOf("ring") < 0) },
-      { name: "Text · three-agent ring", rows: chips.filter(c => c.meta.indexOf("ring") >= 0) },
-      { name: "Vision-language", rows: chips.filter(c => c.domain === "vlm") },
-    ].filter(g => g.rows.length);
-    const deltas = c => ({ co: nf(c.ours) - nf(c.base), tt: nf(c.ttrl) - nf(c.base), gt: nf(c.gt) - nf(c.base) });
-    const MAX = Math.max(...chips.map(c => { const d = deltas(c); return Math.max(d.co, d.tt, d.gt, 0); })) * 1.08;
-    const pct = v => (Math.max(v, 0) / MAX * 100).toFixed(1);
-    let html = "";
-    groups.forEach(g => {
-      html += `<div class="dr-group">${esc(g.name)}</div>`;
-      g.rows.forEach(c => {
-        const d = deltas(c);
-        const meta = c.domain === "vlm" ? c.meta.split("·")[1].trim() : (c.meta.indexOf("ring") >= 0 ? "N=3" : c.variant.replace("Co-RL ", "").replace(/[()]/g, ""));
-        html += `<div class="dr-row">
-          <span class="dr-label"><b>${esc(c.model)}</b><i>${esc(meta)}</i></span>
-          <span class="vb-track" title="Gains over Base ${fmt(c.base)}: Co-RL +${d.co.toFixed(2)}, TTRL +${d.tt.toFixed(2)}, GT-Reward +${d.gt.toFixed(2)}">
-            <span class="vb-bar co" style="width:${pct(d.co)}%"></span>
-            <span class="vb-bar tt" style="width:${pct(d.tt)}%"></span>
-            <span class="vb-gt" style="left:${pct(d.gt)}%"></span>
-          </span>
-          <span class="dr-nums"><b class="n-co">${fmt(c.ours)}</b> <em>TTRL ${fmt(c.ttrl)} · GT ${fmt(c.gt)}</em></span>
-        </div>`;
-      });
-    });
-    $("#verdict-chart").innerHTML = html;
-  }
-
-  function setupVerdict() {
-    $("#verdict-domain").addEventListener("change", renderVerdict);
-    const t = $("#verdict-df-only");
-    t.addEventListener("click", () => {
-      t.classList.toggle("is-active");
-      t.setAttribute("aria-pressed", t.classList.contains("is-active"));
-      renderVerdict();
-    });
-    renderVerdict();
-  }
 
   /* =============== PROBE =============== */
   const LEVEL_COLOR = { "different family": "#7b50a2", "same family": "#0072b2", "seed only": "#d99e2f" };
-  // text needs AA contrast on white; the light gray stays for dots and bars only
-  const LEVEL_TEXT = { "different family": "#5d3a80", "same family": "#005c8f", "seed only": "#8a6d1f" };
 
   function renderKappaStrip() {
     const XMAX = 0.62, B0 = 0.42, B1 = 0.51;
@@ -245,83 +169,6 @@
     fill(); renderResults();
   }
 
-  /* =============== OBJECTIONS CARDS =============== */
-  // Evidence bars in the reference page's style: label, track, printed value.
-  // Bars start at zero, so ranking is visual and precision stays in the number.
-  function barRows(items, maxHint) {
-    const max = maxHint || Math.max(...items.map(it => nf(it.value))) * 1.06;
-    return `<div class="bar-rows">` + items.map(it => {
-      const w = (nf(it.value) / max * 100).toFixed(1);
-      return `<div class="bar-row">
-        <span class="bar-label">${esc(it.label)}</span>
-        <span class="bar-track"><span class="bar-fill" style="width:${w}%;background:${it.color}"></span></span>
-        <span class="bar-value">${fmt(it.value)}</span></div>`;
-    }).join("") + `</div>`;
-  }
-
-  const BLUE = "#0072b2", VIOLET = "#7b50a2", GRAY = "#a9b2b9";
-
-  function renderControls() {
-    const eLL = R.ensLLM, gv = s => avgOf(eLL.find(r => r.setting === s));
-    const eV = (g, s) => avgOf(R.ensVLM.find(r => r.group === g && r.setting === s));
-    const comAvg = m => avgOf(R.comas.rows.find(r => r.method === m));
-    const n3gain = R.n3.map(b => (avgN(b.rows.find(r => r.method.indexOf("Co-RL") === 0)) - avgN(rowBy(b.rows, "Base"))).toFixed(1));
-
-    const ensBars = barRows([
-      { label: "TTRL · Qwen2.5-3B", value: gv("TTRL (Qwen2.5-3B)"), color: BLUE },
-      { label: "TTRL · Llama-3.2-3B", value: gv("TTRL (Llama-3.2-3B)"), color: BLUE },
-      { label: "TTRL · ensemble", value: gv("TTRL (ensemble)"), color: BLUE },
-      { label: "Co-RL · Qwen2.5-3B", value: gv("Co-RL (Qwen2.5-3B)"), color: VIOLET },
-      { label: "Co-RL · Llama-3.2-3B", value: gv("Co-RL (Llama-3.2-3B)"), color: VIOLET },
-      { label: "Co-RL · ensemble", value: gv("Co-RL (ensemble)"), color: VIOLET },
-    ]);
-    const comasBars = barRows([
-      { label: "Base", value: comAvg("Base"), color: GRAY },
-      { label: "MAPoRL", value: comAvg("MAPoRL"), color: BLUE },
-      { label: "TTRL", value: comAvg("TTRL"), color: BLUE },
-      { label: "CoMAS", value: comAvg("CoMAS"), color: BLUE },
-      { label: "Co-RL (Different family)", value: comAvg("Co-RL (Different family)"), color: VIOLET },
-    ]);
-    const n3Bars = barRows(R.n3.flatMap(b => [
-      { label: b.model + " · base", value: avgOf(rowBy(b.rows, "Base")), color: GRAY },
-      { label: b.model + " · Co-RL", value: avgOf(b.rows.find(r => r.method.indexOf("Co-RL") === 0)), color: VIOLET },
-      { label: b.model + " · GT-Reward", value: avgOf(rowBy(b.rows, "GT-Reward")), color: BLUE },
-    ]));
-
-    $("#controls-cards").innerHTML = `
-      <div class="control-card">
-        <p class="eyebrow">Objection 1 · You trained two models</p>
-        <h3>The same two models trained with TTRL do not close the gap</h3>
-        <div class="big-num">${fmt(gv("Co-RL (ensemble)"))} <small>vs ${fmt(gv("TTRL (ensemble)"))} · text maj@8</small></div>
-        <p>Both methods train the same two base models and pool eight rollouts for majority voting at test
-           time, so the training and inference budgets are matched.</p>
-        ${ensBars}
-        <p>The multimodal ensembles hold the same order on open-r1 and MMR1.</p>
-        <p class="src-note">GSM8K, MATH-500, and AMC at maj@8 with T = 0.6. This regime is never mixed with
-          the seven-benchmark tables.</p>
-      </div>
-      <div class="control-card">
-        <p class="eyebrow">Objection 2 · Multi-agent RL already does this</p>
-        <h3>Under CoMAS's own protocol, Co-RL leads with half the agents and no judge</h3>
-        <div class="big-num">${fmt(comAvg("Co-RL (Different family)"))} <small>vs ${fmt(comAvg("CoMAS"))} avg</small></div>
-        <p>The setup, implementation, and graders are CoMAS's own, and prior rows are quoted from their
-           paper. Co-RL leads five of the seven benchmarks and the average.</p>
-        ${comasBars}
-        <p class="src-note">The CoMAS aggregation grades multi-candidate coding answers at effectively
-          pass@5, so the coding benchmarks use majority voting over execution behavior instead.</p>
-      </div>
-      <div class="control-card">
-        <p class="eyebrow">Objection 3 · Does it scale past two agents?</p>
-        <h3>One ring trains three models at once, and all three improve</h3>
-        <div class="big-num">+${n3gain[0]} / +${n3gain[1]} / +${n3gain[2]} <small>avg gains over base</small></div>
-        <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together along the ring. Each agent
-           matches or outperforms its own labeled reference.</p>
-        ${n3Bars}
-        <p class="src-note">Same configuration as the two-agent runs. Full rows are under Three agents in
-          the explorer.</p>
-      </div>`;
-  }
-
   /* =============== FURNITURE =============== */
   function setupLightbox() {
     const box = $("#lightbox"), img = $("#lightbox-image"), closeBtn = $("#lightbox-close");
@@ -369,10 +216,8 @@
   }
 
   function init() {
-    setupVerdict();
     renderKappaStrip();
     setupResults();
-    renderControls();
     setupLightbox();
     setupNav();
     setupBibtex();

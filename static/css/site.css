@@ -124,8 +124,6 @@ code { font-family: var(--mono); font-size: .92em; }
 .media-button:hover img, .media-button:focus-visible img { transform: scale(1.015); }
 .data-table tbody tr { transition: box-shadow .12s ease; }
 .data-table tbody tr:hover td { box-shadow: inset 0 0 0 99px rgba(27, 34, 44, .045); }
-.bar-row { border-radius: 6px; transition: background .15s ease; }
-.bar-row:hover { background: rgba(123, 80, 162, .06); }
 
 .num { font-family: var(--mono); font-weight: 500; color: var(--violet-dark); white-space: nowrap; }
 .num.bad { color: var(--red); }
@@ -196,12 +194,6 @@ select {
 }
 .toggle-button.is-active { background: var(--violet); border-color: var(--violet); color: #fff; }
 
-.axis-title { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 4px 0 14px; }
-.lg { padding-left: 16px; position: relative; white-space: nowrap; }
-.lg::before { content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 11px; height: 7px; border-radius: 2px; }
-.lg-co::before { background: var(--violet); }
-.lg-tt::before { background: var(--blue); }
-.lg-gt::before { background: transparent; border-left: 2.5px dashed var(--ink); width: 3px; height: 12px; }
 .dr-group {
   font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
   color: var(--muted); background: var(--paper-deep); border-radius: 6px; padding: 5px 10px; margin: 18px 0 8px;
@@ -213,11 +205,6 @@ select {
 .dr-label i { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .dr-row { border-radius: 8px; transition: background .15s ease; }
 .dr-row:hover { background: rgba(123, 80, 162, .06); }
-.vb-track { flex: 1; position: relative; height: 24px; background: var(--paper); border-radius: 4px; }
-.vb-bar { position: absolute; left: 0; border-radius: 0 5px 5px 0; }
-.vb-bar.co { top: 3px; height: 8px; background: var(--violet); }
-.vb-bar.tt { bottom: 3px; height: 8px; background: var(--blue); opacity: .85; }
-.vb-gt { position: absolute; top: -2px; bottom: -2px; width: 0; border-left: 2.5px dashed var(--ink); }
 .kb-track { flex: 1; position: relative; height: 15px; background: var(--paper); border-radius: 4px; overflow: hidden; }
 .kb-band { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, rgba(27, 34, 44, .08) 0 3px, transparent 3px 7px); }
 .kb-bar { position: absolute; left: 0; top: 2px; height: 11px; border-radius: 0 5px 5px 0; }
@@ -253,23 +240,14 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 .sub-head { font-size: 20px; margin: 44px 0 6px; }
 .heat-note { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 12px; line-height: 1.6; }
 
-/* ---------- evidence bars (reference-page style) ---------- */
-.bar-rows { margin: 12px 0; }
-.bar-row { display: flex; align-items: center; gap: 10px; margin: 7px 0; }
-.bar-label { font-size: 12.5px; color: #3c4450; width: 168px; flex-shrink: 0; line-height: 1.25; }
-.bar-track { flex: 1; background: var(--paper-deep); border-radius: 4px; height: 13px; overflow: hidden; }
-.bar-fill { display: block; height: 100%; border-radius: 4px; }
-.bar-value { font-family: var(--mono); font-size: 12.5px; width: 44px; text-align: right; flex-shrink: 0; }
 
 /* ---------- controls cards ---------- */
 .cards-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 28px 0 8px; }
 .control-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; }
 .control-card .eyebrow { font-size: 11px; margin-bottom: 8px; }
 .control-card h3 { margin: 0 0 6px; font-size: 17px; }
-.control-card .big-num { font-family: var(--mono); font-size: 26px; color: var(--violet-dark); margin: 6px 0 10px; }
-.control-card .big-num small { font-size: 15px; color: var(--muted); }
+.card-fig { width: 100%; height: auto; margin-top: auto; padding-top: 10px; }
 .control-card p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 10px; }
-.control-card .src-note { font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; margin-top: auto; line-height: 1.5; }
 
 .code-block {
   background: #241f2e; color: #ece7f2; border-radius: 14px; padding: 18px 22px;
