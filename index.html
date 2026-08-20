@@ -16,12 +16,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-6">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-7">
 </head>
 <body>
   <header class="site-header">
     <nav class="nav shell" aria-label="Primary navigation">
-      <a class="brand" href="#top" aria-label="Co-RL, back to top"><b>CO-RL</b> · DIVERSE COHORT</a>
+      <a class="brand" href="#top" aria-label="Co-RL, back to top"><b>CO-RL</b></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
       <div class="nav-links" id="nav-links">
         <a href="#problem">Problem</a>
@@ -43,8 +43,9 @@
     <section class="hero section-shell" aria-label="Paper overview">
       <p class="kicker">Label-free RL for reasoning</p>
       <h1 id="paper-title">Co-RL: Unsupervised Reasoning Emerges from <em>Diverse Cohort</em> in Multi-agent RL</h1>
-      <p class="hero-question">Self-rewarding RL reinforces whatever the model already believes.
-        <mark class="signal-highlight">How different does a peer have to be before its vote is worth learning from?</mark></p>
+      <p class="hero-question">Training solely on self-generated feedback can reinforce existing biases and lead
+        to training collapse. <mark class="signal-highlight">Can unsupervised reasoning emerge through
+        cooperative multi-agent training?</mark></p>
       <div class="authors" id="authors">
         <span>Yunhao Yang<sup>1,*</sup></span>
         <span>Yuexin Bian<sup>2,*</sup></span>
@@ -84,24 +85,26 @@
       <div class="section-head">
         <p class="eyebrow">01 / The problem</p>
         <h2>Labels made RL for reasoning work. Labels are also its bottleneck.</h2>
-        <p class="lede">Reinforcement learning with verifiable rewards is the standard recipe for stronger
-          reasoning, and it needs a checked answer for every training question. Those answers are costly to
-          produce, and they become scarce exactly where they matter most: as target capabilities approach
-          what humans can reliably evaluate.</p>
+        <p class="lede">Reinforcement learning with verifiable rewards has emerged as a powerful approach for
+          improving reasoning in language and vision-language models, yet its strongest successes still depend
+          heavily on ground-truth supervision. Such supervision is costly to obtain and becomes increasingly
+          scarce as target reasoning capabilities approach or surpass what humans can reliably evaluate.</p>
       </div>
       <div class="step-grid" aria-label="The problem in three statements">
-        <div class="step-card"><span class="idx">01 · THE LABEL BILL</span>
-          <strong>Someone has to write the answer key</strong>
-          <p>Every training question needs a verified answer. Those answers are costly to produce, and the
-             frontier questions are exactly the ones humans can no longer check reliably.</p></div>
-        <div class="step-card"><span class="idx">02 · THE SHORTCUT</span>
-          <strong>Self-rewarding drops the labels and lets the model grade itself</strong>
-          <p>The reward comes from the model's own behavior: its majority vote (TTRL), its confidence
-             (Intuitor), its entropy (RENT), or agreement with a copy of itself (Co-rewarding).</p></div>
-        <div class="step-card"><span class="idx">03 · THE CATCH</span>
-          <strong>A model that grades itself is rewarded for confidence, not correctness</strong>
-          <p>Whatever it already believes gets reinforced. Prolonged training can homogenize responses,
-             degenerate, or collapse. Section 05 shows the training curves where this happens.</p></div>
+        <div class="step-card"><span class="idx">01 · VERIFIABLE REWARDS</span>
+          <strong>RLVR needs a verified answer for every prompt</strong>
+          <p>Its strongest successes still depend heavily on ground-truth supervision, and such annotations
+             do not scale with the reasoning we now ask models to learn.</p></div>
+        <div class="step-card"><span class="idx">02 · SELF-REWARDING RL</span>
+          <strong>Self-rewarding RL derives rewards from the model's own completions</strong>
+          <p>The signal can be agreement with its majority-vote prediction (TTRL), self-certainty (Intuitor),
+             predictive entropy (RENT), or consistency across paraphrased inputs or moving-average policies
+             (Co-rewarding).</p></div>
+        <div class="step-card"><span class="idx">03 · THE FAILURE MODE</span>
+          <strong>These signals remain within a single model's own predictions</strong>
+          <p>Without an external reference, such self-reinforcement can amplify existing biases and suboptimal
+             behaviors, reduce response diversity, and ultimately lead to increasingly homogeneous outputs or
+             even training collapse. Section 05 shows the training curves.</p></div>
       </div>
 
     </section>
@@ -112,10 +115,11 @@
       <div class="section-head">
         <p class="eyebrow">02 / The idea</p>
         <h2>Co-RL takes the reward from a peer, never from the model itself.</h2>
-        <p class="lede">If the failure comes from the model grading itself, the fix is structural: keep the
-          majority vote, but take it from someone else. Multiple models with separate parameters train side
-          by side, and each one is rewarded when its answer matches a peer's vote. The self-confirmation loop
-          cannot close, because the target comes from independently updated weights.</p>
+        <p class="lede">Such a signal can come from independently trained models. Since their errors are not
+          perfectly correlated, each model can provide corrective feedback that the other cannot derive from
+          its own generations. Co-RL therefore takes the learning signal from a separate model, giving each
+          agent decorrelated supervision: a target produced by independently updated weights that is less
+          likely to echo its own biases.</p>
       </div>
 
       <figure class="media-card">
@@ -131,19 +135,18 @@
 
       <div class="step-grid" aria-label="The three steps of Co-RL">
         <div class="step-card"><span class="idx">STEP 01</span>
-          <strong>Every agent samples and votes</strong>
-          <p>Each of N agents independently samples K completions for the same unlabeled prompt and reduces
-             them to a self-consistency majority vote.</p></div>
+          <strong>Each agent samples completions and votes</strong>
+          <p>Given an unlabeled prompt, each agent samples multiple completions and aggregates them into a
+             pseudo-answer through majority voting.</p></div>
         <div class="step-card"><span class="idx">STEP 02</span>
-          <strong>The peer's vote becomes the reward</strong>
-          <p>An agent earns reward 1 when its answer matches the vote of the previous agent on the ring, and
-             0 otherwise. With two agents, they simply grade each other. An agent never contributes to its
-             own supervision target.</p></div>
+          <strong>One agent's completions are rewarded against another agent's pseudo-answer</strong>
+          <p>A response receives reward 1 when its extracted answer agrees with the peer's pseudo-label, and
+             0 otherwise. In the two-agent setting, the two agents supervise each other. Crucially, an agent
+             never contributes to its own supervision target.</p></div>
         <div class="step-card"><span class="idx">STEP 03</span>
-          <strong>Each policy updates alone</strong>
-          <p>Rewards are normalized within each agent's own rollout group, and each policy takes its own
-             GRPO step. No shared parameters, no exchanged gradients. The one exchanged vote per prompt is
-             the entire coupling.</p></div>
+          <strong>The resulting rewards drive policy optimization with GRPO</strong>
+          <p>The agents share neither parameters nor gradients; their optimization is coupled solely through
+             the rewards they provide to one another.</p></div>
       </div>
 
       <figure class="media-card">
@@ -173,11 +176,11 @@
       <div class="section-head">
         <p class="eyebrow">03 / The result</p>
         <h2>Trained with zero labels, it matches training with the labels.</h2>
-        <p class="lede">If the fix is structural, it should survive the harshest comparison available: the
-          same GRPO recipe trained on the real answers, under the same budget. The bars below are gains over each
-          Base model; TTRL rides along as the strongest self-rewarding baseline, and the dashed mark is
-          GT-Reward, the labeled reference. One row per backbone-and-training-set block in the paper,
-          losses included.</p>
+        <p class="lede">Across text-only and multimodal domains, Co-RL consistently outperforms the base
+          models and prior label-free approaches, while matching or surpassing supervised methods, without
+          access to any ground-truth labels. The bars below are gains over each Base model. TTRL is shown
+          alongside as the strongest self-rewarding baseline, and the dashed mark is GT-Reward, the labeled
+          reference. One row per backbone-and-training-set block in the paper, losses included.</p>
       </div>
       <div class="panel">
         <div class="controls-row">
@@ -210,15 +213,43 @@
     <section id="why" class="section-shell section-block">
       <div class="section-head">
         <p class="eyebrow">04 / Why it works</p>
-        <h2>More different partners make better teachers.</h2>
-        <p class="lede">Separate parameters stop the degeneration, but they do not decide how much a peer can
-          teach. A partner that fails on the same problems hands an agent back its own error. So the question
-          behind the gains is concrete: do two models make the same mistakes? That is measurable before any
-          training happens.</p>
+        <h2>What a cohort teaches depends on how different its mistakes are.</h2>
+        <p class="lede">Highly similar models tend to make correlated errors and may reinforce the same
+          incorrect answers. Cohort diversity is therefore crucial to the effectiveness of Co-RL, and the
+          paper pushes it as far as the framework allows, through three sources: policy optimization, model
+          families and sizes, and input formation.</p>
       </div>
 
-      <p>Score two base checkpoints on the same 500 MATH problems (levels 3 to 5, zero-shot, single sample at
-        temperature 0.8, rule-based grading). Every problem lands in one of four cells:</p>
+      <h3 class="sub-head">1 · Decoupled policy optimization</h3>
+      <p>Co-RL trains the policies independently, with interaction occurring only through the reward. Each
+        policy maintains its own parameters and optimizer state, with no gradient propagated between
+        policies. This design itself is a source of diversity: independent updates prevent the two policies
+        from being directly coupled, maintaining less-correlated predictions throughout the training process.
+        Panels (b) and (c) below show that decoupled policy optimization stabilizes training and yields
+        consistent improvements over self-rewarding methods.</p>
+      <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
+          <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
+               alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
+        </button>
+        <figcaption>(a) Agreement between the two models, (b) pseudo-label accuracy, and (c) evaluation
+          performance during training. Models from different families keep lower inter-model agreement, yield
+          more accurate pseudo-labels, and reach higher performance. Click to enlarge.</figcaption>
+      </figure>
+
+      <h3 class="sub-head">2 · Diversity across model families and sizes</h3>
+      <p>The primary source of diversity comes from independently pretrained model families. Distinct
+        families differ throughout the model-development pipeline, including architecture, tokenization,
+        pretraining data, and post-training, each of which brings its own inductive biases. Qwen2.5 and
+        Llama 3 differ in their tokenizers, vocabulary sizes, architectural choices, and pretraining corpora,
+        while Gemma introduces a 256K-token vocabulary and interleaved local-global attention. Such
+        differences are even more pronounced for vision-language models, whose families employ distinct
+        vision encoders. Model size provides an additional, orthogonal source of diversity: pairing models of
+        different sizes yields different error profiles, and the three-agent run trains models of different
+        sizes together.</p>
+      <p>The appendix quantifies this diversity before any RL. Score two base checkpoints on the same 500
+        MATH problems (levels 3 to 5, zero-shot, single sample at temperature 0.8, rule-based grading), and
+        every problem lands in one of four cells:</p>
       <table class="contingency" aria-label="The four outcomes for a pair of models">
         <tr><th></th><th>B correct</th><th>B wrong</th></tr>
         <tr><th>A correct</th><td>both correct</td><td>only A correct</td></tr>
@@ -236,9 +267,7 @@
         <div><b>u</b><span><strong>At least one right.</strong> The share of problems outside the both-wrong
           cell. Higher means more problems are recoverable by some member of the pair.</span></div>
       </div>
-
       <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Bar chart of error overlap for the twelve model pairs, grouped by level: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty."></div>
-
       <div class="callout">
         <span class="tag">The finding</span>
         Every different-family pair reaches κ ≤ 0.42 and c ≥ 29.4%. Every same-family and seed-only pair sits
@@ -248,42 +277,39 @@
         not the explanation. And same-family pairs are not distinguishable from seed-only pairs: changing the
         size, the generation, or the sampling seed within a lineage leaves the error structure where it was.
       </div>
-
-      <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
-          <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
-               alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
-        </button>
-        <figcaption>The pre-training gap survives training. Left: agreement between the two agents rises and
-          flattens, and different families flatten lower. Middle: crossing families yields more accurate
-          pseudo-labels, so the extra disagreement is not extra noise. Right: evaluation performance orders
-          the runs the same way. The paper reports the same pattern for vision-language models: the agents
-          retain partial agreement while the accuracy of their exchanged pseudo-labels improves throughout
-          training. Click to enlarge.</figcaption>
-      </figure>
-
-
-
-      <h3 class="sub-head">The ladder has five rungs, and the paper's variants are positions on it.</h3>
-      <p>Each rung decouples one more thing between the two agents. Pick a rung to see what it decouples,
-        what the probe measured, and what training on it delivered.</p>
-      <div class="ladder-layout">
-        <div class="rung-rail" id="rung-rail" aria-label="Decoupling rungs"></div>
-        <div class="rung-panel" id="rung-panel" aria-live="polite"></div>
-      </div>
-
-      <h3 class="sub-head">All twelve pairs, in one table.</h3>
       <div class="data-table-wrap" id="probe-pool-table"></div>
       <div class="callout scope">
         <span class="tag">Scope</span>
         κ and c are two readings of one four-cell measurement; across the twelve pairs they correlate at
         r = −0.98, so they are not independent evidence. Wrong-agreement w is the genuinely additional
         reading. Twelve pairs, several sharing an anchor checkpoint. Two different-family partners
-        (Phi-3.5-mini, MiniCPM3-4B) never appear in a training run. The probe orders the rungs; it does not
-        predict final accuracy quantitatively.
+        (Phi-3.5-mini, MiniCPM3-4B) never appear in a training run. The probe orders the settings; it does
+        not predict final accuracy quantitatively.
       </div>
 
+      <h3 class="sub-head">3 · Diversity across input formation</h3>
+      <p>Despite model-level and optimization-level decoupling, both agents are still trained on identical
+        prompts. The data-decoupled runs further diversify the training data by rewriting each MATH problem
+        with DeepSeek-V3, training one agent on the original prompt and the other on its rewrite. The rewrite
+        preserves the answer and the sample order while typically recasting the problem into a different
+        concrete scenario rather than performing superficial lexical substitutions. The two agents therefore
+        solve semantically equivalent problems expressed in different forms, reducing correlated errors
+        induced by prompt-specific phrasing.</p>
+      <div class="pair-grid" aria-label="A rephrased training pair from the appendix">
+        <div class="step-card"><span class="idx">ORIGINAL</span>
+          <p>How many vertical asymptotes does the graph of y = 2/(x²+x−6) have?</p></div>
+        <div class="step-card"><span class="idx">REPHRASED · DEEPSEEK-V3</span>
+          <p>The function f(t) = 2/(t²+t−6) describes the temperature of a chemical reaction over time t. How
+             many vertical asymptotes appear on the graph of this function? <em>Answer unchanged: 2.</em></p></div>
+      </div>
 
+      <h3 class="sub-head">The three sources, laid out as a ladder.</h3>
+      <p>Each setting decouples one more thing between the two agents. Pick one to see what it decouples,
+        what the probe measured, and what training on it delivered.</p>
+      <div class="ladder-layout">
+        <div class="rung-rail" id="rung-rail" aria-label="Decoupling rungs"></div>
+        <div class="rung-panel" id="rung-panel" aria-live="polite"></div>
+      </div>
     </section>
 
     <!-- ================= 05 BENCHMARKS ================= -->
@@ -481,8 +507,8 @@ cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-6"></script>
-  <script src="static/data/results.js?v=20260819-6"></script>
-  <script src="static/js/site.js?v=20260819-6"></script>
+  <script src="static/data/content.js?v=20260819-7"></script>
+  <script src="static/data/results.js?v=20260819-7"></script>
+  <script src="static/js/site.js?v=20260819-7"></script>
 </body>
 </html>

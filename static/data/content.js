@@ -39,7 +39,7 @@ window.siteContent = {
       kappa: "κ 0.51–0.58",
       badge: "Diagnostic only",
       badgeTone: "muted",
-      what: "Same weights, different sampling seed. The two views share every parameter and differ in generation noise alone.",
+      what: "A checkpoint paired with itself under a different sampling seed, so the two views share every weight and differ in generation noise alone.",
       measured: "κ 0.51–0.58, complementarity 19.0–24.6% across four seed-only pairs.",
       trained: "Never trained. This rung exists as the capability control that makes the anchor comparison work: the seed-only row is a model paired with itself, so capability is identical and the partner is the only variable.",
       result: ""
