@@ -125,7 +125,7 @@ code { font-family: var(--mono); font-size: .92em; }
 .data-table tbody tr { transition: box-shadow .12s ease; }
 .data-table tbody tr:hover td { box-shadow: inset 0 0 0 99px rgba(27, 34, 44, .045); }
 
-.num { font-family: var(--mono); font-weight: 500; color: var(--violet-dark); white-space: nowrap; }
+.num { font-family: var(--sans); font-weight: 700; color: var(--violet-dark); white-space: nowrap; }
 .num.bad { color: var(--red); }
 
 /* ---------- shared section furniture ---------- */
@@ -168,7 +168,7 @@ code { font-family: var(--mono); font-size: .92em; }
   width: 100%; text-align: left; background: none; border: 0; cursor: pointer; padding: 20px 22px;
 }
 .fr-num { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; color: #8a6d1f; line-height: 1.5; }
-.fr-claim { font-family: var(--sans); font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.45; }
+.fr-claim { font-family: var(--sans); font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.45; }
 .fr-icon { font-family: var(--mono); font-size: 19px; color: #b98524; transition: transform .18s ease; }
 .finding-row.is-open .fr-icon { transform: rotate(45deg); }
 .fr-body { padding: 0 22px 18px calc(190px + 42px); }
@@ -251,7 +251,7 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 }
 
 /* ---------- explorer extras ---------- */
-.sub-head { font-size: 20px; margin: 44px 0 6px; }
+.sub-head { font-family: var(--serif); font-weight: 400; font-size: 24px; margin: 48px 0 10px; }
 .heat-note { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 12px; line-height: 1.6; }
 
 
@@ -267,7 +267,7 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 .card-link { font-family: var(--mono); font-size: 13px; color: var(--ink); text-decoration: none; margin-top: 12px; }
 .card-link:hover { color: var(--violet-dark); }
 .control-card .eyebrow { font-size: 11px; margin-bottom: 8px; }
-.control-card h3 { margin: 0 0 6px; font-size: 17px; }
+.control-card h3 { margin: 0 0 8px; font-size: 19.5px; line-height: 1.35; }
 .card-fig { width: 100%; height: auto; margin-top: auto; padding-top: 10px; }
 .control-card p { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 10px; }
 
