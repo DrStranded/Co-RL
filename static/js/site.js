@@ -91,82 +91,6 @@
     renderVerdict();
   }
 
-  /* =============== LADDER =============== */
-  // Per-rung results, computed live from siteResults. Text rungs show the average
-  // gain over Base for that variant on all four backbones; the modality rung shows
-  // the vision-language gains; the seed-only rung shows the probe's overlap bars.
-  function rungViz(rung) {
-    const VIOLET = "#7b50a2", AMBER = "#d99e2f";
-    const gain = (b, method, dp) => {
-      const co = b.rows.find(r => r.method === method);
-      const base = rowBy(b.rows, "Base");
-      if (!co || !base) return null;
-      return "+" + (avgN(co) - avgN(base)).toFixed(dp);
-    };
-    if (rung.id === "seed") {
-      const items = R.decPool.filter(p => p.level === "seed only").map(p => (
-        { label: p.pair, value: p.kappa.toFixed(2), color: AMBER }));
-      return `<span class="rp-label">The four seed-only pairs, error overlap κ</span>` + barRows(items, 0.62) +
-        `<p class="chart-note">Full definitions of κ are above; these pairs exist as the capability control.</p>`;
-    }
-    if (rung.id === "modality") {
-      const items = [...R.vlmSmall, ...R.vlmLarge].map(b => {
-        const v = gain(b, b.rows.find(r => r.method.indexOf("Co-RL") === 0).method, 2);
-        return { label: b.backbone + " · " + b.dataset, value: v, color: VIOLET };
-      });
-      return `<span class="rp-label">Average gain over Base, four-benchmark multimodal suite</span>` + barRows(items);
-    }
-    const variant = { "same-family": "Co-RL (Same family)", "diff-family": "Co-RL (Different family)",
-                      "diff-data": "Co-RL (Different family+)" }[rung.id];
-    if (!variant) return "";
-    const items = R.llmMain.map(b => ({ label: b.backbone, value: gain(b, variant, 1), color: VIOLET }))
-                           .filter(it => it.value !== null);
-    return `<span class="rp-label">Average gain over Base, seven-benchmark text suite</span>` + barRows(items);
-  }
-
-  function renderRungPanel(rung) {
-    let html = `<span class="badge tone-${rung.badgeTone}">${esc(rung.badge)}</span>
-      <h3>Rung ${esc(rung.index)}: ${esc(rung.label)}</h3>
-      <p>${esc(rung.what)}</p>
-      <span class="rp-label">Measured</span><p>${esc(rung.measured)}</p>
-      <span class="rp-label">Trained</span><p>${esc(rung.trained)}</p>`;
-    if (rung.result) html += `<span class="rp-label">Result</span><p>${esc(rung.result)}</p>`;
-    html += `<div class="rung-viz">${rungViz(rung)}</div>`;
-    if (rung.rephrase) {
-      html += `<div class="rephrase-toggle">
-        <div class="rephrase-tabs" aria-label="Original or rephrased prompt">
-          <button type="button" class="is-active" data-pane="original" aria-pressed="true">Original prompt</button>
-          <button type="button" data-pane="rephrased" aria-pressed="false">DeepSeek-V3 rewrite</button>
-        </div>
-        <div class="rephrase-body" id="rephrase-body">${esc(rung.rephrase.original)}</div>
-      </div>`;
-    }
-    $("#rung-panel").innerHTML = html;
-    if (rung.rephrase) {
-      $$(".rephrase-tabs button").forEach(btn => btn.addEventListener("click", () => {
-        $$(".rephrase-tabs button").forEach(b => { b.classList.remove("is-active"); b.setAttribute("aria-pressed", "false"); });
-        btn.classList.add("is-active"); btn.setAttribute("aria-pressed", "true");
-        $("#rephrase-body").textContent = rung.rephrase[btn.dataset.pane];
-      }));
-    }
-  }
-
-  function setupLadder() {
-    const rail = $("#rung-rail");
-    rail.innerHTML = C.rungs.map((r, i) => `
-      <button class="rung-button${i === 2 ? " is-active" : ""}" type="button" data-rung="${i}" aria-pressed="${i === 2}">
-        <span class="rung-idx">${esc(r.index)}</span>
-        <span><span class="rung-name">${esc(r.label)}</span>
-        <span class="rung-kappa">${esc(r.kappa)}</span></span>
-      </button>`).join("");
-    $$(".rung-button", rail).forEach(btn => btn.addEventListener("click", () => {
-      $$(".rung-button", rail).forEach(b => { b.classList.remove("is-active"); b.setAttribute("aria-pressed", "false"); });
-      btn.classList.add("is-active"); btn.setAttribute("aria-pressed", "true");
-      renderRungPanel(C.rungs[Number(btn.dataset.rung)]);
-    }));
-    renderRungPanel(C.rungs[2]); // default: Different family, the main setting
-  }
-
   /* =============== PROBE =============== */
   const LEVEL_COLOR = { "different family": "#7b50a2", "same family": "#0072b2", "seed only": "#d99e2f" };
   // text needs AA contrast on white; the light gray stays for dots and bars only
@@ -193,27 +117,10 @@
         </div>`;
       });
     });
-    html += `<p class="chart-note">Bars are the error overlap κ for each base-checkpoint pair, shorter is more
-      decoupled. The shaded strip is κ ${B0}–${B1}: no pair ends inside it. Hover a bar for the pair's
-      complementarity and wrong-agreement.</p>`;
+    html += `<p class="chart-note">κ is Cohen's kappa over the two models' error patterns. Lower means they
+      fail on different problems. No bar ends inside the shaded strip. Hover a bar for the pair's
+      complementarity and wrong agreement.</p>`;
     $("#kappa-strip").innerHTML = html;
-  }
-
-  function renderPoolTable() {
-    let html = `<table class="data-table"><thead><tr>
-      <th>Pair</th><th>Level</th>
-      <th title="error overlap, lower is better">overlap κ ↓</th>
-      <th title="share where exactly one model is correct">complementarity c ↑ (%)</th>
-      <th title="share where both are wrong with the same answer">wrong agreement w ↓ (%)</th>
-      <th title="share where at least one model is correct">at least one right u ↑ (%)</th></tr></thead><tbody>`;
-    let tier = null;
-    R.decPool.forEach(p => {
-      if (p.tier !== tier) { tier = p.tier; html += `<tr class="group-row"><td colspan="6">${esc(tier)}</td></tr>`; }
-      html += `<tr><td>${esc(p.pair)}</td><td style="font-family:var(--sans);font-size:13px;color:${LEVEL_TEXT[p.level]}">${esc(p.level)}</td>
-        <td>${p.kappa.toFixed(2)}</td><td>${p.c.toFixed(1)}</td><td>${p.w.toFixed(1)}</td><td>${p.u.toFixed(1)}</td></tr>`;
-    });
-    html += "</tbody></table>";
-    $("#probe-pool-table").innerHTML = html;
   }
 
   /* =============== RESULTS EXPLORER =============== */
@@ -290,24 +197,14 @@
   }
 
   const TEXT_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    On Qwen2.5-3B, Same family (48.7) edges Different family (48.5). The downstream ladder is directional,
-    not monotone on every backbone, even though the pre-RL κ ladder is clean. What holds on all four text
-    backbones: Different family beats the strongest self-rewarding baseline everywhere, and Different family+
-    posts the best label-free average everywhere, by 0.8 to 2.0 points.</div>`;
+    Same family edges Different family on Qwen2.5-3B, so the ordering is directional rather than monotone on
+    every backbone. Different family beats the strongest self-rewarding baseline on all four text backbones.
+    Different family+ posts the best label-free average on all four, by <span class="num">0.8 to 2.0%</span>.</div>`;
   const VLM_NOTE = `<div class="callout honesty"><span class="tag">Stated plainly</span>
-    On InternVL-3.5-2B with MMR1, TTRL's 45.30 average beats Co-RL's 45.15. That is the one setting of four
-    the small pair loses. Base is graded once with the corrected multiple-choice grader, so it is identical
-    across the two training sets. MMR1 blocks use the corrected grader and open-r1 blocks the legacy grader,
-    and the two are never compared with each other.</div>
-    <p class="chart-note">Vision-language families pair different encoders with different backbones:
-    Qwen2.5-VL uses a natively trained dynamic-resolution ViT, InternVL uses InternViT, Gemma 3 uses SigLIP.
-    At 7B to 12B, with InternVL3.5-8B as the shared partner, Co-RL improves the base models by 7.2%, 6.3%,
-    and 5.8%, beats TTRL for all three families, and on Gemma-3-12B beats the labeled reference outright
-    (47.56 vs 45.17).</p>`;
+    TTRL wins one of the four small-pair settings, on InternVL-3.5-2B with MMR1. At 7B to 12B, Co-RL beats
+    TTRL for all three families and beats the labeled reference on Gemma-3-12B.</div>`;
   const N3_NOTE = `<div class="callout"><span class="tag">One run, three improved models</span>
-    Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B trained together along the directed ring, with average
-    gains of 7.8, 6.0, and 8.2 points over base. Each agent matches or outperforms its own labeled reference.
-    Rows are per-agent, so do not read them against the two-agent tables.</div>`;
+    Rows are per-agent from a single three-model run and are not read against the two-agent tables.</div>`;
 
   function resultsOptions(domain) {
     if (domain === "text") return R.llmMain.map((b, i) => ({ v: String(i), label: b.backbone + " (" + b.tier + ")" }));
@@ -394,70 +291,35 @@
     $("#controls-cards").innerHTML = `
       <div class="control-card">
         <p class="eyebrow">Objection 1 · You trained two models</p>
-        <h3>Train the same two models with TTRL instead, and the gain does not appear.</h3>
+        <h3>The same two models trained with TTRL do not close the gap</h3>
         <div class="big-num">${fmt(gv("Co-RL (ensemble)"))} <small>vs ${fmt(gv("TTRL (ensemble)"))} · text maj@8</small></div>
-        <p>The same two base models are trained independently with TTRL. At inference both methods pool four
-           rollouts from each model for majority voting, matching the training-model and test-time budgets.
-           The weaker partner is the one that moves:</p>
+        <p>Both methods train the same two base models and pool eight rollouts for majority voting at test
+           time, so the training and inference budgets are matched.</p>
         ${ensBars}
-        <p>Multimodal, blocks kept apart: ${fmt(eV("open-r1", "Co-RL (ensemble)"))} vs
-           ${fmt(eV("open-r1", "TTRL (ensemble)"))} on open-r1, and
-           ${fmt(eV("MMR1", "Co-RL (ensemble)"))} vs ${fmt(eV("MMR1", "TTRL (ensemble)"))} on MMR1.
-           In the paper's words, “…the advantage of Co-RL cannot be explained merely by training two
-           models.”</p>
-        <p class="src-note">Protocol: GSM8K, MATH-500, AMC at maj@8, T = 0.6. This is a different evaluation
-          regime from the seven-benchmark tables and is never mixed with them.</p>
+        <p>The multimodal ensembles hold the same order on open-r1 and MMR1.</p>
+        <p class="src-note">GSM8K, MATH-500, and AMC at maj@8 with T = 0.6. This regime is never mixed with
+          the seven-benchmark tables.</p>
       </div>
       <div class="control-card">
         <p class="eyebrow">Objection 2 · Multi-agent RL already does this</p>
-        <h3>Under CoMAS's own setup, Co-RL wins with half the agents and no judge.</h3>
+        <h3>Under CoMAS's own protocol, Co-RL leads with half the agents and no judge</h3>
         <div class="big-num">${fmt(comAvg("Co-RL (Different family)"))} <small>vs ${fmt(comAvg("CoMAS"))} avg</small></div>
-        <p>Same setup, official implementation, and evaluation protocol as CoMAS, with prior rows quoted from
-           their paper. Co-RL leads five of the seven benchmarks and the average, with no LLM judge and no
-           learned reward model.</p>
+        <p>The setup, implementation, and graders are CoMAS's own, and prior rows are quoted from their
+           paper. Co-RL leads five of the seven benchmarks and the average.</p>
         ${comasBars}
-        <p class="src-note">Caveat that travels with this claim: CoMAS's coding aggregation admits a
-          pass@5-versus-pass@1 loophole, worth 7.3% to the untrained baseline and 2.4% to Co-RL. The authors
-          keep the five-sample budget but replace the aggregation with majority voting over candidates
-          clustered by execution behavior. This table's suite and graders are CoMAS's, and its numbers never
-          share an axis with the seven-benchmark tables.</p>
+        <p class="src-note">The CoMAS aggregation grades multi-candidate coding answers at effectively
+          pass@5, so the coding benchmarks use majority voting over execution behavior instead.</p>
       </div>
       <div class="control-card">
         <p class="eyebrow">Objection 3 · Does it scale past two agents?</p>
-        <h3>One ring trains three models at once, and all three improve.</h3>
+        <h3>One ring trains three models at once, and all three improve</h3>
         <div class="big-num">+${n3gain[0]} / +${n3gain[1]} / +${n3gain[2]} <small>avg gains over base</small></div>
-        <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B trained together in a single run along the
-           directed ring: models of different families and sizes. Each agent matches or outperforms its own
-           labeled reference, and beats TTRL on the two 3B models while tying it on Qwen3-1.7B.</p>
+        <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together along the ring. Each agent
+           matches or outperforms its own labeled reference.</p>
         ${n3Bars}
-        <p class="src-note">Same training configuration as the two-agent language runs. Full per-benchmark
-          rows are in the Benchmarks explorer under Three agents.</p>
+        <p class="src-note">Same configuration as the two-agent runs. Full rows are under Three agents in
+          the explorer.</p>
       </div>`;
-  }
-
-  /* =============== THEORY PHASE DIAGRAM =============== */
-  function renderPhaseDiagram() {
-    const S = 340, M = 44, P = S - 2 * M;
-    const px = v => M + v * P, py = v => S - M - v * P;
-    let svg = `<svg viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg" font-family="DM Mono, monospace">`;
-    svg += `<polygon points="${px(0)},${py(1)} ${px(1)},${py(1)} ${px(1)},${py(0)}" fill="#ece4f3"/>`;
-    svg += `<polygon points="${px(0)},${py(1)} ${px(0)},${py(0)} ${px(1)},${py(0)}" fill="#f7e4e4"/>`;
-    svg += `<rect x="${M}" y="${M}" width="${P}" height="${P}" fill="none" stroke="#1b222c" stroke-width="1.5"/>`;
-    svg += `<line x1="${px(0)}" y1="${py(1)}" x2="${px(1)}" y2="${py(0)}" stroke="#1b222c" stroke-width="1.5" stroke-dasharray="6 4"/>`;
-    svg += `<text x="${px(0.30)}" y="${py(0.66)}" font-size="10.5" fill="#1b222c" text-anchor="middle" transform="rotate(-45 ${px(0.30)} ${py(0.66)})">chances sum to 1</text>`;
-    svg += `<text x="${px(0.63)}" y="${py(0.86)}" font-size="11" fill="#5d3a80" text-anchor="middle">end up right together</text>`;
-    svg += `<text x="${px(0.32)}" y="${py(0.13)}" font-size="11" fill="#be3737" text-anchor="middle">end up wrong together</text>`;
-    svg += `<circle cx="${px(1)}" cy="${py(1)}" r="6" fill="#5d3a80"/><text x="${px(1) - 10}" y="${py(1) - 8}" font-size="10.5" text-anchor="end" fill="#5d3a80">both right, stable</text>`;
-    svg += `<circle cx="${px(0)}" cy="${py(0)}" r="6" fill="#be3737"/><text x="${px(0) + 10}" y="${py(0) + 14}" font-size="10.5" fill="#be3737">both wrong, stable</text>`;
-    svg += `<circle cx="${px(0.5)}" cy="${py(0.5)}" r="5.5" fill="#fff" stroke="#1b222c" stroke-width="2"/><text x="${px(0.5) + 9}" y="${py(0.5) + 14}" font-size="10.5" fill="#1b222c">tipping point</text>`;
-    [[0.9, 0.2], [0.2, 0.9]].forEach(pt => {
-      svg += `<circle cx="${px(pt[0])}" cy="${py(pt[1])}" r="5" fill="#7b50a2"/>`;
-      svg += `<text x="${px(pt[0]) + (pt[0] > 0.5 ? -8 : 8)}" y="${py(pt[1]) - 8}" font-size="10.5" fill="#5d3a80" text-anchor="${pt[0] > 0.5 ? "end" : "start"}">(${pt[0]}, ${pt[1]})</text>`;
-    });
-    svg += `<text x="${px(0.5)}" y="${S - 8}" font-size="11" text-anchor="middle" fill="#67707b">chance agent A is right</text>`;
-    svg += `<text x="12" y="${py(0.5)}" font-size="11" text-anchor="middle" fill="#67707b" transform="rotate(-90 12 ${py(0.5)})">chance agent B is right</text>`;
-    svg += `</svg>`;
-    $("#phase-diagram").innerHTML = svg;
   }
 
   /* =============== FURNITURE =============== */
@@ -508,12 +370,9 @@
 
   function init() {
     setupVerdict();
-    setupLadder();
     renderKappaStrip();
-    renderPoolTable();
     setupResults();
     renderControls();
-    renderPhaseDiagram();
     setupLightbox();
     setupNav();
     setupBibtex();
