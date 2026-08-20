@@ -24,26 +24,26 @@
   function verdictChips(dfOnly) {
     const chips = [];
     R.llmMain.forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward");
+      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
       const cands = b.rows.filter(r => dfOnly ? r.method === "Co-RL (Different family)" : CO_VARIANTS.includes(r.method));
-      if (!gt || !cands.length) return;
+      if (!gt || !base || !cands.length) return;
       const best = cands.reduce((a, r) => avgN(r) > avgN(a) ? r : a);
       chips.push({ domain: "text", model: b.backbone, meta: "text · 7-benchmark avg",
-                   variant: best.method, ours: avgOf(best), gt: avgOf(gt) });
+                   variant: best.method, ours: avgOf(best), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
     });
     R.n3.forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward");
+      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
       const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
-      if (!gt || !co) return;
+      if (!gt || !base || !co) return;
       chips.push({ domain: "text", model: b.model, meta: "text · three-agent ring · 7-benchmark avg",
-                   variant: "Co-RL (Different family), N=3", ours: avgOf(co), gt: avgOf(gt) });
+                   variant: "Co-RL (Different family), N=3", ours: avgOf(co), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
     });
     [...R.vlmSmall, ...R.vlmLarge].forEach(b => {
-      const gt = rowBy(b.rows, "GT-Reward");
+      const gt = rowBy(b.rows, "GT-Reward"), base = rowBy(b.rows, "Base"), tt = rowBy(b.rows, "TTRL");
       const co = b.rows.find(r => r.method.indexOf("Co-RL") === 0);
-      if (!gt || !co) return;
+      if (!gt || !base || !co) return;
       chips.push({ domain: "vlm", model: b.backbone, meta: "multimodal · " + b.dataset + " · 4-benchmark avg",
-                   variant: co.method, ours: avgOf(co), gt: avgOf(gt) });
+                   variant: co.method, ours: avgOf(co), gt: avgOf(gt), base: avgOf(base), ttrl: avgOf(tt) });
     });
     return chips;
   }
@@ -57,24 +57,23 @@
       { name: "Text · three-agent ring", rows: chips.filter(c => c.meta.indexOf("ring") >= 0) },
       { name: "Vision-language", rows: chips.filter(c => c.domain === "vlm") },
     ].filter(g => g.rows.length);
-    const DMAX = 2.6; // fixed scale so rows are comparable across renders
+    const deltas = c => ({ co: nf(c.ours) - nf(c.base), tt: nf(c.ttrl) - nf(c.base), gt: nf(c.gt) - nf(c.base) });
+    const MAX = Math.max(...chips.map(c => { const d = deltas(c); return Math.max(d.co, d.tt, d.gt, 0); })) * 1.08;
+    const pct = v => (Math.max(v, 0) / MAX * 100).toFixed(1);
     let html = "";
     groups.forEach(g => {
       html += `<div class="dr-group">${esc(g.name)}</div>`;
       g.rows.forEach(c => {
-        const d = nf(c.ours) - nf(c.gt);
-        const pos = d >= 0;
-        const w = Math.min(Math.abs(d) / DMAX, 1) * 50;
+        const d = deltas(c);
         const meta = c.domain === "vlm" ? c.meta.split("·")[1].trim() : (c.meta.indexOf("ring") >= 0 ? "N=3" : c.variant.replace("Co-RL ", "").replace(/[()]/g, ""));
-        const dtxt = (pos ? "+" : "−") + Math.abs(d).toFixed(c.domain === "vlm" ? 2 : 1);
         html += `<div class="dr-row">
           <span class="dr-label"><b>${esc(c.model)}</b><i>${esc(meta)}</i></span>
-          <span class="dr-track">
-            <span class="dr-zero"></span>
-            <span class="dr-bar ${pos ? "pos" : "neg"}" style="${pos ? "left:50%" : "right:50%"};width:${w.toFixed(1)}%"></span>
+          <span class="vb-track" title="Gains over Base ${fmt(c.base)}: Co-RL +${d.co.toFixed(2)}, TTRL +${d.tt.toFixed(2)}, GT-Reward +${d.gt.toFixed(2)}">
+            <span class="vb-bar co" style="width:${pct(d.co)}%"></span>
+            <span class="vb-bar tt" style="width:${pct(d.tt)}%"></span>
+            <span class="vb-gt" style="left:${pct(d.gt)}%"></span>
           </span>
-          <span class="dr-nums">${fmt(c.ours)} <em>vs ${fmt(c.gt)}</em>
-            <span class="vc-delta ${pos ? "pos" : "neg"}">${dtxt}</span></span>
+          <span class="dr-nums"><b class="n-co">${fmt(c.ours)}</b> <em>TTRL ${fmt(c.ttrl)} · GT ${fmt(c.gt)}</em></span>
         </div>`;
       });
     });
@@ -141,41 +140,30 @@
   const LEVEL_TEXT = { "different family": "#5d3a80", "same family": "#005c8f", "seed only": "#5f6a72" };
 
   function renderKappaStrip() {
-    const pts = R.decPool;
-    const W = 900, H = 240, L = 168, Rt = 30, axisY = 196;
-    const xmin = 0.28, xmax = 0.62;
-    const x = k => L + (k - xmin) / (xmax - xmin) * (W - L - Rt);
-    const lanes = { "different family": 64, "same family": 112, "seed only": 160 };
-    const dfMax = Math.max(...pts.filter(p => p.level === "different family").map(p => p.kappa));
-    const otMin = Math.min(...pts.filter(p => p.level !== "different family").map(p => p.kappa));
-    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="DM Mono, monospace">`;
-    // empty band, behind everything
-    svg += `<rect x="${x(dfMax)}" y="40" width="${x(otMin) - x(dfMax)}" height="${axisY - 46}" fill="#f8ecd4"/>`;
-    svg += `<text x="${(x(dfMax) + x(otMin)) / 2}" y="30" text-anchor="middle" font-size="12" fill="#8a6d1f">κ ${dfMax.toFixed(2)}–${otMin.toFixed(2)}: no pair lands here</text>`;
-    // one labeled lane per level
-    Object.keys(lanes).forEach(lv => {
-      const y = lanes[lv];
-      svg += `<line x1="${L}" y1="${y}" x2="${W - Rt}" y2="${y}" stroke="#dcdcd4" stroke-width="1"/>`;
-      svg += `<text x="${L - 14}" y="${y + 4}" text-anchor="end" font-size="13" fill="${LEVEL_TEXT[lv]}" font-family="DM Sans, sans-serif" font-weight="600">${lv}</text>`;
+    const XMAX = 0.62, B0 = 0.42, B1 = 0.51;
+    const pct = v => (v / XMAX * 100).toFixed(2);
+    const order = ["different family", "same family", "seed only"];
+    let html = "";
+    order.forEach(lv => {
+      const rows = R.decPool.filter(p => p.level === lv).sort((a, b) => a.kappa - b.kappa);
+      const lo = Math.min(...rows.map(p => p.kappa)).toFixed(2);
+      const hi = Math.max(...rows.map(p => p.kappa)).toFixed(2);
+      html += `<div class="dr-group">${esc(lv)} · κ ${lo}–${hi}</div>`;
+      rows.forEach(p => {
+        html += `<div class="dr-row kb-row">
+          <span class="dr-label"><b>${esc(p.pair)}</b><i>${esc(p.tier)}</i></span>
+          <span class="kb-track" title="${esc(p.pair)}: κ ${p.kappa}, complementarity ${p.c}%, wrong-agreement ${p.w}%, oracle ${p.u}%">
+            <span class="kb-band" style="left:${pct(B0)}%;width:${pct(B1 - B0)}%"></span>
+            <span class="kb-bar" style="width:${pct(p.kappa)}%;background:${LEVEL_COLOR[p.level]}"></span>
+          </span>
+          <span class="dr-nums"><b>${p.kappa.toFixed(2)}</b></span>
+        </div>`;
+      });
     });
-    // axis
-    svg += `<line x1="${L}" y1="${axisY}" x2="${W - Rt}" y2="${axisY}" stroke="#1b222c" stroke-width="1.5"/>`;
-    for (let t = 0.30; t <= 0.61; t += 0.05) {
-      svg += `<line x1="${x(t)}" y1="${axisY}" x2="${x(t)}" y2="${axisY + 6}" stroke="#1b222c"/>`;
-      svg += `<text x="${x(t)}" y="${axisY + 22}" text-anchor="middle" font-size="12" fill="#67707b">${t.toFixed(2)}</text>`;
-    }
-    svg += `<text x="${W - Rt}" y="${axisY + 40}" text-anchor="end" font-size="12" fill="#67707b">error overlap κ (lower = the two models fail on different problems)</text>`;
-    // dots: duplicates within a lane stack upward
-    const seen = {};
-    pts.forEach(p => {
-      const key = p.kappa.toFixed(2) + p.level;
-      seen[key] = (seen[key] || 0) + 1;
-      const cy = lanes[p.level] - (seen[key] - 1) * 15;
-      svg += `<circle cx="${x(p.kappa)}" cy="${cy}" r="6.5" fill="${LEVEL_COLOR[p.level]}" stroke="#f8f7f3" stroke-width="1.5">` +
-             `<title>${esc(p.pair)} (${esc(p.tier)}): κ ${p.kappa}, c ${p.c}%, w ${p.w}%, u ${p.u}%</title></circle>`;
-    });
-    svg += `</svg>`;
-    $("#kappa-strip").innerHTML = svg;
+    html += `<p class="chart-note">Bars are the error overlap κ for each base-checkpoint pair, shorter is more
+      decoupled. The shaded strip is κ ${B0}–${B1}: no pair ends inside it. Hover a bar for the pair's
+      complementarity and wrong-agreement.</p>`;
+    $("#kappa-strip").innerHTML = html;
   }
 
   function renderPoolTable() {

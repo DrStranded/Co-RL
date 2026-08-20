@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-4">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-5">
 </head>
 <body>
   <header class="site-header">
@@ -196,8 +196,10 @@
         <p class="eyebrow">03 / The result</p>
         <h2>Trained with zero labels, it matches training with the labels.</h2>
         <p class="lede">If the fix is structural, it should survive the harshest comparison available: the
-          same GRPO recipe trained on the real answers, under the same budget. That comparison is GT-Reward,
-          a labeled reference. One chip per backbone-and-training-set block in the paper, losses included.</p>
+          same GRPO recipe trained on the real answers, under the same budget. The bars below are gains over each
+          Base model; TTRL rides along as the strongest self-rewarding baseline, and the dashed mark is
+          GT-Reward, the labeled reference. One row per backbone-and-training-set block in the paper,
+          losses included.</p>
       </div>
       <div class="panel">
         <div class="controls-row">
@@ -210,7 +212,9 @@
           </label>
           <button class="toggle-button" id="verdict-df-only" type="button" aria-pressed="false">Different family only</button>
         </div>
-        <p class="axis-title">Co-RL label-free average minus GT-Reward labeled reference, in points</p>
+        <p class="axis-title">Average gain over the Base model, in points ·
+          <span class="lg lg-co">Co-RL</span> · <span class="lg lg-tt">TTRL</span> ·
+          <span class="lg lg-gt">GT-Reward labeled reference</span></p>
         <div id="verdict-chart" aria-live="polite"></div>
         <p class="scope-note">
           GT-Reward is GRPO with ground-truth rewards under this same recipe and budget. It is a labeled
@@ -247,7 +251,7 @@
         case a majority vote cannot detect. The overlap of the two error patterns is summarized by one number,
         κ (Cohen's kappa). Lower κ means the two models fail on different problems.</p>
 
-      <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Strip plot of error overlap for the twelve model pairs: every different-family pair at or below 0.42, every same-family and seed-only pair at or above 0.51, with the band between shaded and labeled no pair lands here."></div>
+      <div class="chart-wrap" id="kappa-strip" role="img" aria-label="Bar chart of error overlap for the twelve model pairs, grouped by level: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty."></div>
 
       <div class="callout">
         <span class="tag">The finding</span>
@@ -465,8 +469,8 @@ cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-4"></script>
-  <script src="static/data/results.js?v=20260819-4"></script>
-  <script src="static/js/site.js?v=20260819-4"></script>
+  <script src="static/data/content.js?v=20260819-5"></script>
+  <script src="static/data/results.js?v=20260819-5"></script>
+  <script src="static/js/site.js?v=20260819-5"></script>
 </body>
 </html>
