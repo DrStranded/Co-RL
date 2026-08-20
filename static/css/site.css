@@ -178,17 +178,26 @@ select {
 }
 .toggle-button.is-active { background: var(--violet); border-color: var(--violet); color: #fff; }
 
-.chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 14px; }
-.verdict-chip { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--paper); }
-.verdict-chip .vc-model { font-weight: 600; font-size: 14.5px; margin-bottom: 2px; }
-.verdict-chip .vc-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-.verdict-chip .vc-nums { display: flex; align-items: baseline; gap: 8px; font-family: var(--mono); }
-.verdict-chip .vc-ours { font-size: 21px; color: var(--violet-dark); }
-.verdict-chip .vc-gt { font-size: 14px; color: var(--muted); }
-.verdict-chip .vc-delta { font-size: 13px; font-weight: 500; border-radius: 6px; padding: 1px 7px; }
+.axis-title { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 4px 0 14px; }
+.dr-group {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); background: var(--paper-deep); border-radius: 6px; padding: 5px 10px; margin: 18px 0 8px;
+}
+.dr-group:first-child { margin-top: 0; }
+.dr-row { display: flex; align-items: center; gap: 14px; padding: 5px 0; }
+.dr-label { width: 230px; flex-shrink: 0; line-height: 1.25; }
+.dr-label b { display: block; font-size: 14px; font-weight: 600; }
+.dr-label i { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.dr-track { flex: 1; position: relative; height: 16px; background: var(--paper); border-radius: 4px; }
+.dr-zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1.5px; background: var(--gray-bar); }
+.dr-bar { position: absolute; top: 2px; height: 12px; }
+.dr-bar.pos { background: var(--violet); border-radius: 0 6px 6px 0; }
+.dr-bar.neg { background: var(--red); border-radius: 6px 0 0 6px; }
+.dr-nums { width: 190px; flex-shrink: 0; text-align: right; font-family: var(--mono); font-size: 13.5px; }
+.dr-nums em { font-style: normal; color: var(--muted); font-size: 12px; }
+.vc-delta { font-family: var(--mono); font-size: 12.5px; font-weight: 500; border-radius: 6px; padding: 1px 7px; margin-left: 6px; }
 .vc-delta.pos { color: var(--violet-dark); background: var(--violet-soft); }
 .vc-delta.neg { color: var(--red); background: var(--red-soft); }
-.verdict-chip .vc-variant { font-size: 12px; color: var(--muted); margin-top: 8px; }
 .scope-note { font-size: 13.5px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 14px; line-height: 1.6; }
 
 /* ---------- ladder ---------- */
@@ -370,10 +379,10 @@ table.data-table { border-collapse: collapse; width: 100%; font-size: 14px; }
   .section-block { padding-top: 64px; }
   .hero { padding-top: 48px; }
   .panel { padding: 16px; }
-  .chip-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 460px) {
-  .chip-grid { grid-template-columns: 1fr; }
+  .dr-row { flex-wrap: wrap; gap: 6px 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .dr-label { width: auto; flex: 1; }
+  .dr-nums { width: auto; font-size: 12px; }
+  .dr-track { order: 3; flex-basis: 100%; }
 }
 
 /* anchor offset for the sticky header */

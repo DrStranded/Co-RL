@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-3">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-4">
 </head>
 <body>
   <header class="site-header">
@@ -41,7 +41,7 @@
 
     <!-- ================= HERO ================= -->
     <section class="hero section-shell" aria-label="Paper overview">
-      <p class="kicker">Label-free RL for reasoning · the reward comes from a peer, not from yourself</p>
+      <p class="kicker">Label-free RL for reasoning</p>
       <h1 id="paper-title">Co-RL: Unsupervised Reasoning Emerges from <em>Diverse Cohort</em> in Multi-agent RL</h1>
       <p class="hero-question">Self-rewarding RL reinforces whatever the model already believes.
         <mark class="signal-highlight">How different does a peer have to be before its vote is worth learning from?</mark></p>
@@ -69,12 +69,12 @@
         <a class="button button-light" href="#bibtex">BibTeX</a>
       </div>
       <div class="stat-strip" aria-label="Headline numbers">
-        <div class="stat-chip"><strong>0.53 → 0.38</strong>
-          <span>How much two agents' errors overlap, moving from the same lineage to a different family. Measured on twelve base-checkpoint pairs, before any RL.</span></div>
-        <div class="stat-chip"><strong>+3.0–8.6% · +2.3–7.2%</strong>
-          <span>Average gains with zero ground-truth labels: seven text benchmarks across four LLMs, four multimodal benchmarks across five vision-language models (2B–12B).</span></div>
-        <div class="stat-chip"><strong>+0.8–2.0%</strong>
-          <span>Margin over the strongest self-rewarding baseline on the seven-benchmark text suite.</span></div>
+        <div class="stat-chip"><strong>0</strong>
+          <span>ground-truth labels used</span></div>
+        <div class="stat-chip"><strong>+3.0–8.6%</strong>
+          <span>seven text benchmarks, four LLMs</span></div>
+        <div class="stat-chip"><strong>+2.3–7.2%</strong>
+          <span>four multimodal benchmarks, five vision-language models (2B–12B)</span></div>
       </div>
     </section>
 
@@ -210,7 +210,8 @@
           </label>
           <button class="toggle-button" id="verdict-df-only" type="button" aria-pressed="false">Different family only</button>
         </div>
-        <div class="chip-grid" id="verdict-chips" aria-live="polite"></div>
+        <p class="axis-title">Co-RL label-free average minus GT-Reward labeled reference, in points</p>
+        <div id="verdict-chart" aria-live="polite"></div>
         <p class="scope-note">
           GT-Reward is GRPO with ground-truth rewards under this same recipe and budget. It is a labeled
           reference, not a bound on what supervised training can reach. Apart from AMC (avg@8, averaged over
@@ -258,24 +259,6 @@
         size, the generation, or the sampling seed within a lineage leaves the error structure where it was.
       </div>
 
-      <div class="data-table-wrap" id="probe-pool-table"></div>
-      <div class="callout scope">
-        <span class="tag">Scope</span>
-        κ and c are two readings of one four-cell measurement; across the twelve pairs they correlate at
-        r = −0.98, so they are not independent evidence. Wrong-agreement w is the genuinely additional
-        reading. Twelve pairs, several sharing an anchor checkpoint. Two different-family partners
-        (Phi-3.5-mini, MiniCPM3-4B) never appear in a training run. The probe orders the rungs; it does not
-        predict final accuracy quantitatively.
-      </div>
-
-      <h3 class="sub-head">The ladder has five rungs, and the paper's variants are positions on it.</h3>
-      <p>Each rung decouples one more thing between the two agents. Pick a rung to see what it decouples,
-        what the probe measured, and what training on it delivered.</p>
-      <div class="ladder-layout">
-        <div class="rung-rail" id="rung-rail" aria-label="Decoupling rungs"></div>
-        <div class="rung-panel" id="rung-panel" aria-live="polite"></div>
-      </div>
-
       <figure class="media-card">
         <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
           <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
@@ -288,6 +271,29 @@
           retain partial agreement while the accuracy of their exchanged pseudo-labels improves throughout
           training. Click to enlarge.</figcaption>
       </figure>
+
+
+
+      <h3 class="sub-head">The ladder has five rungs, and the paper's variants are positions on it.</h3>
+      <p>Each rung decouples one more thing between the two agents. Pick a rung to see what it decouples,
+        what the probe measured, and what training on it delivered.</p>
+      <div class="ladder-layout">
+        <div class="rung-rail" id="rung-rail" aria-label="Decoupling rungs"></div>
+        <div class="rung-panel" id="rung-panel" aria-live="polite"></div>
+      </div>
+
+      <h3 class="sub-head">All twelve pairs, in one table.</h3>
+      <div class="data-table-wrap" id="probe-pool-table"></div>
+      <div class="callout scope">
+        <span class="tag">Scope</span>
+        κ and c are two readings of one four-cell measurement; across the twelve pairs they correlate at
+        r = −0.98, so they are not independent evidence. Wrong-agreement w is the genuinely additional
+        reading. Twelve pairs, several sharing an anchor checkpoint. Two different-family partners
+        (Phi-3.5-mini, MiniCPM3-4B) never appear in a training run. The probe orders the rungs; it does not
+        predict final accuracy quantitatively.
+      </div>
+
+
     </section>
 
     <!-- ================= 05 BENCHMARKS ================= -->
@@ -459,8 +465,8 @@ cd ../mllm &amp;&amp; bash examples/different_family_qwen25vl3b_x_internvl35_2b.
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-3"></script>
-  <script src="static/data/results.js?v=20260819-3"></script>
-  <script src="static/js/site.js?v=20260819-3"></script>
+  <script src="static/data/content.js?v=20260819-4"></script>
+  <script src="static/data/results.js?v=20260819-4"></script>
+  <script src="static/js/site.js?v=20260819-4"></script>
 </body>
 </html>

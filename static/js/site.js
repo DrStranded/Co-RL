@@ -52,20 +52,33 @@
     const domain = $("#verdict-domain").value;
     const dfOnly = $("#verdict-df-only").classList.contains("is-active");
     const chips = verdictChips(dfOnly).filter(c => domain === "all" || c.domain === domain);
-    $("#verdict-chips").innerHTML = chips.map(c => {
-      const d = nf(c.ours) - nf(c.gt);
-      const sign = d >= 0 ? "+" : "−";
-      const cls = d >= 0 ? "pos" : "neg";
-      const word = d >= 0 ? "" : " (approaches)";
-      return `<div class="verdict-chip">
-        <div class="vc-model">${esc(c.model)}</div>
-        <div class="vc-meta">${esc(c.meta)}</div>
-        <div class="vc-nums"><span class="vc-ours">${fmt(c.ours)}</span>
-          <span class="vc-gt">vs ${fmt(c.gt)}</span>
-          <span class="vc-delta ${cls}">${sign}${Math.abs(d).toFixed(c.domain === "vlm" ? 2 : 1)}</span></div>
-        <div class="vc-variant">${esc(c.variant)}${word} · label-free avg vs labeled reference</div>
-      </div>`;
-    }).join("");
+    const groups = [
+      { name: "Text · two-agent pairs", rows: chips.filter(c => c.domain === "text" && c.meta.indexOf("ring") < 0) },
+      { name: "Text · three-agent ring", rows: chips.filter(c => c.meta.indexOf("ring") >= 0) },
+      { name: "Vision-language", rows: chips.filter(c => c.domain === "vlm") },
+    ].filter(g => g.rows.length);
+    const DMAX = 2.6; // fixed scale so rows are comparable across renders
+    let html = "";
+    groups.forEach(g => {
+      html += `<div class="dr-group">${esc(g.name)}</div>`;
+      g.rows.forEach(c => {
+        const d = nf(c.ours) - nf(c.gt);
+        const pos = d >= 0;
+        const w = Math.min(Math.abs(d) / DMAX, 1) * 50;
+        const meta = c.domain === "vlm" ? c.meta.split("·")[1].trim() : (c.meta.indexOf("ring") >= 0 ? "N=3" : c.variant.replace("Co-RL ", "").replace(/[()]/g, ""));
+        const dtxt = (pos ? "+" : "−") + Math.abs(d).toFixed(c.domain === "vlm" ? 2 : 1);
+        html += `<div class="dr-row">
+          <span class="dr-label"><b>${esc(c.model)}</b><i>${esc(meta)}</i></span>
+          <span class="dr-track">
+            <span class="dr-zero"></span>
+            <span class="dr-bar ${pos ? "pos" : "neg"}" style="${pos ? "left:50%" : "right:50%"};width:${w.toFixed(1)}%"></span>
+          </span>
+          <span class="dr-nums">${fmt(c.ours)} <em>vs ${fmt(c.gt)}</em>
+            <span class="vc-delta ${pos ? "pos" : "neg"}">${dtxt}</span></span>
+        </div>`;
+      });
+    });
+    $("#verdict-chart").innerHTML = html;
   }
 
   function setupVerdict() {
@@ -129,36 +142,37 @@
 
   function renderKappaStrip() {
     const pts = R.decPool;
-    const W = 900, H = 210, L = 40, Rt = 30, axisY = 150;
+    const W = 900, H = 240, L = 168, Rt = 30, axisY = 196;
     const xmin = 0.28, xmax = 0.62;
     const x = k => L + (k - xmin) / (xmax - xmin) * (W - L - Rt);
+    const lanes = { "different family": 64, "same family": 112, "seed only": 160 };
     const dfMax = Math.max(...pts.filter(p => p.level === "different family").map(p => p.kappa));
     const otMin = Math.min(...pts.filter(p => p.level !== "different family").map(p => p.kappa));
     let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="DM Mono, monospace">`;
-    svg += `<rect x="${x(dfMax)}" y="52" width="${x(otMin) - x(dfMax)}" height="${axisY - 52}" fill="#f8ecd4"/>`;
-    svg += `<text x="${(x(dfMax) + x(otMin)) / 2}" y="44" text-anchor="middle" font-size="12" fill="#8a6d1f">κ ${dfMax.toFixed(2)}–${otMin.toFixed(2)}: no pair lands here</text>`;
+    // empty band, behind everything
+    svg += `<rect x="${x(dfMax)}" y="40" width="${x(otMin) - x(dfMax)}" height="${axisY - 46}" fill="#f8ecd4"/>`;
+    svg += `<text x="${(x(dfMax) + x(otMin)) / 2}" y="30" text-anchor="middle" font-size="12" fill="#8a6d1f">κ ${dfMax.toFixed(2)}–${otMin.toFixed(2)}: no pair lands here</text>`;
+    // one labeled lane per level
+    Object.keys(lanes).forEach(lv => {
+      const y = lanes[lv];
+      svg += `<line x1="${L}" y1="${y}" x2="${W - Rt}" y2="${y}" stroke="#dcdcd4" stroke-width="1"/>`;
+      svg += `<text x="${L - 14}" y="${y + 4}" text-anchor="end" font-size="13" fill="${LEVEL_TEXT[lv]}" font-family="DM Sans, sans-serif" font-weight="600">${lv}</text>`;
+    });
+    // axis
     svg += `<line x1="${L}" y1="${axisY}" x2="${W - Rt}" y2="${axisY}" stroke="#1b222c" stroke-width="1.5"/>`;
     for (let t = 0.30; t <= 0.61; t += 0.05) {
       svg += `<line x1="${x(t)}" y1="${axisY}" x2="${x(t)}" y2="${axisY + 6}" stroke="#1b222c"/>`;
       svg += `<text x="${x(t)}" y="${axisY + 22}" text-anchor="middle" font-size="12" fill="#67707b">${t.toFixed(2)}</text>`;
     }
-    svg += `<text x="${W - Rt}" y="${axisY + 42}" text-anchor="end" font-size="12" fill="#67707b">error overlap κ (lower = the two models fail on different problems)</text>`;
-    const lanes = { "different family": 96, "same family": 116, "seed only": 140 };
+    svg += `<text x="${W - Rt}" y="${axisY + 40}" text-anchor="end" font-size="12" fill="#67707b">error overlap κ (lower = the two models fail on different problems)</text>`;
+    // dots: duplicates within a lane stack upward
     const seen = {};
     pts.forEach(p => {
       const key = p.kappa.toFixed(2) + p.level;
       seen[key] = (seen[key] || 0) + 1;
-      // duplicates within a level stack away from the neighboring lane
-      const dir = p.level === "seed only" ? 1 : -1;
-      const cy = lanes[p.level] + (seen[key] - 1) * 14 * dir;
-      svg += `<circle cx="${x(p.kappa)}" cy="${cy}" r="7" fill="${LEVEL_COLOR[p.level]}" opacity="0.88">` +
+      const cy = lanes[p.level] - (seen[key] - 1) * 15;
+      svg += `<circle cx="${x(p.kappa)}" cy="${cy}" r="6.5" fill="${LEVEL_COLOR[p.level]}" stroke="#f8f7f3" stroke-width="1.5">` +
              `<title>${esc(p.pair)} (${esc(p.tier)}): κ ${p.kappa}, c ${p.c}%, w ${p.w}%, u ${p.u}%</title></circle>`;
-    });
-    let lx = L;
-    Object.keys(LEVEL_COLOR).forEach(lv => {
-      svg += `<circle cx="${lx}" cy="16" r="6" fill="${LEVEL_COLOR[lv]}"/>`;
-      svg += `<text x="${lx + 12}" y="20" font-size="12.5" fill="#1b222c">${lv}</text>`;
-      lx += 22 + lv.length * 7.6;
     });
     svg += `</svg>`;
     $("#kappa-strip").innerHTML = svg;
