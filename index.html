@@ -10,13 +10,13 @@
   <meta property="og:title" content="Co-RL: Unsupervised Reasoning Emerges from Diverse Cohort in Multi-agent RL">
   <meta property="og:description" content="Label-free RL where each model is rewarded by a peer's majority vote. More diverse cohorts make better teachers.">
   <meta property="og:url" content="https://drstranded.github.io/Co-RL/">
-  <meta property="og:image" content="https://drstranded.github.io/Co-RL/static/images/fig-overview.png?v=18">
+  <meta property="og:image" content="https://drstranded.github.io/Co-RL/static/images/fig-overview.png?v=19">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237b50a2'/%3E%3Ccircle cx='22' cy='32' r='9' fill='%23f8f7f3'/%3E%3Ccircle cx='42' cy='32' r='9' fill='none' stroke='%23f8f7f3' stroke-width='4'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-18">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-19">
 </head>
 <body>
   <header class="site-header">
@@ -134,8 +134,8 @@
       </div>
 
       <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig1-compare-ring.png?v=18" aria-label="Enlarge the comparison of label-free reward designs">
-          <img src="static/images/fig1-compare-ring.png?v=18" width="2400" height="684"
+        <button class="media-button" type="button" data-lightbox="static/images/fig1-compare-ring.png?v=19" aria-label="Enlarge the comparison of label-free reward designs">
+          <img src="static/images/fig1-compare-ring.png?v=19" width="2400" height="684"
                alt="Comparison of four label-free reward designs: TTRL and Co-rewarding derive rewards from self-generated agreement, CoMAS scores multi-turn interactions with one of its own agents as judge, and Co-RL derives rewards directly from peer votes, passed along a directed ring beyond two agents.">
         </button>
         <figcaption>Where the reward comes from in four label-free designs. Beyond two agents, the votes pass
@@ -158,8 +158,8 @@
       </div>
 
       <figure class="media-card fig-medium">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-overview.png?v=18" aria-label="Enlarge the Co-RL overview diagram">
-          <img src="static/images/fig-overview.png?v=18" width="2169" height="1338" loading="lazy"
+        <button class="media-button" type="button" data-lightbox="static/images/fig-overview.png?v=19" aria-label="Enlarge the Co-RL overview diagram">
+          <img src="static/images/fig-overview.png?v=19" width="2169" height="1338" loading="lazy"
                alt="Overview of Co-RL with two agents: each agent samples K responses to the same unlabeled question, forms a majority-vote pseudo-label, and each rollout is rewarded by agreement with the peer's pseudo-label, followed by independent GRPO updates.">
         </button>
         <figcaption>The full mechanism with two agents. Each agent samples K responses, votes, and is rewarded
@@ -179,8 +179,8 @@
           further decouples the training data.</p>
       </div>
       <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-results.png?v=18" aria-label="Enlarge the main results figure">
-          <img src="static/images/fig-results.png?v=18" width="2872" height="908"
+        <button class="media-button" type="button" data-lightbox="static/images/fig-results.png?v=19" aria-label="Enlarge the main results figure">
+          <img src="static/images/fig-results.png?v=19" width="2872" height="908"
                alt="Average gain over the Base model for every setting: Co-RL and TTRL as paired bars, GT-Reward as a dashed reference tick. Panels: text two-agent pairs, text three-agent ring, vision-language.">
         </button>
         <figcaption>Average gain over the Base model on each setting's benchmark suite (%). Dashed ticks are
@@ -217,8 +217,8 @@
           </ul>
         </div>
         <figure class="media-card">
-          <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png?v=18" aria-label="Enlarge the mechanism panels">
-            <img src="static/images/fig-mechanism-panels.png?v=18" width="2200" height="765" loading="lazy"
+          <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png?v=19" aria-label="Enlarge the mechanism panels">
+            <img src="static/images/fig-mechanism-panels.png?v=19" width="2200" height="765" loading="lazy"
                  alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
           </button>
           <figcaption>(a) Agreement, (b) pseudo-label accuracy, and (c) MATH-500 accuracy during training,
@@ -231,8 +231,8 @@
         also differ in their vision encoders. How much two models' errors overlap can be measured before any
         training, on 500 MATH problems per pair.</p>
       <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-kappa.png?v=18" aria-label="Enlarge the error overlap chart">
-          <img src="static/images/fig-kappa.png?v=18" width="2689" height="846" loading="lazy"
+        <button class="media-button" type="button" data-lightbox="static/images/fig-kappa.png?v=19" aria-label="Enlarge the error overlap chart">
+          <img src="static/images/fig-kappa.png?v=19" width="2689" height="846" loading="lazy"
                alt="Vertical bar chart of error overlap for twelve base-checkpoint pairs: every different-family pair ends at or below 0.42, every same-family and seed-only pair at or above 0.51, and the shaded strip between is empty.">
         </button>
         <figcaption>Error overlap κ (Cohen's kappa) for twelve base-checkpoint pairs, before any RL. Click to
@@ -304,8 +304,8 @@
           </ul>
         </div>
         <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png?v=18" aria-label="Enlarge training dynamics at four scales">
-          <img src="static/images/fig-dynamics-4scale.png?v=18" width="2200" height="1579" loading="lazy"
+        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png?v=19" aria-label="Enlarge training dynamics at four scales">
+          <img src="static/images/fig-dynamics-4scale.png?v=19" width="2200" height="1579" loading="lazy"
                alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
         </button>
         <figcaption>Validation accuracy, reward standard deviation, and mean completion length at four scales.
@@ -329,8 +329,8 @@
              benchmarks. Co-RL's ensemble reaches <span class="num">66.9%</span> versus
              <span class="num bad">64.9%</span>, and the TTRL ensemble stays below its own best single
              model.</p>
-          <img src="static/images/fig-abl-ensemble.png?v=18" width="1088" height="648" loading="lazy" class="card-fig"
-               alt="Range plot of macro-average maj@8: each method shows its two single models as dots and its ensemble as a diamond. The TTRL diamond sits below its best single model, the Co-RL diamond sits above both of its members.">
+          <img src="static/images/fig-abl-ensemble.png?v=19" width="1088" height="648" loading="lazy" class="card-fig"
+               alt="Vertical grouped bars of macro-average maj@8 on a truncated axis: Co-RL beats TTRL for both single models and for the ensemble, and the TTRL ensemble scores below its best single model.">
           <a class="card-link" href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Open the paper <span aria-hidden="true">↗</span></a>
         </div>
         <div class="control-card accent-blue">
@@ -339,7 +339,7 @@
           <p>Same setup, official implementation, and graders, with prior rows quoted from their paper. Co-RL
              reaches <span class="num">62.97%</span> versus <span class="num bad">58.94%</span> for CoMAS,
              with half the agents and no judge.</p>
-          <img src="static/images/fig-abl-comas.png?v=18" width="1088" height="648" loading="lazy" class="card-fig"
+          <img src="static/images/fig-abl-comas.png?v=19" width="1088" height="648" loading="lazy" class="card-fig"
                alt="Vertical bars of seven-benchmark averages under the CoMAS protocol: Base 56.92, MAPoRL 58.22, TTRL 58.18, CoMAS 58.94, Co-RL 62.97.">
           <a class="card-link" href="https://arxiv.org/abs/2608.17253" target="_blank" rel="noreferrer">Open the paper <span aria-hidden="true">↗</span></a>
         </div>
@@ -349,8 +349,8 @@
           <p>Qwen2.5-3B, Llama-3.2-3B-Instruct, and Qwen3-1.7B train together in one ring. They gain
              <span class="num">7.8%</span>, <span class="num">6.0%</span>, and <span class="num">8.2%</span>
              and match or beat their labeled references.</p>
-          <img src="static/images/fig-abl-n3.png?v=18" width="1088" height="648" loading="lazy" class="card-fig"
-               alt="Three horizontal arrows from each Base score to the Co-RL score, with dashed GT-Reward marks: gains of 7.8, 6.0, and 8.2 points, each arrow reaching or passing its mark.">
+          <img src="static/images/fig-abl-n3.png?v=19" width="1088" height="648" loading="lazy" class="card-fig"
+               alt="Vertical grouped bars from Base to Co-RL for the three ring-trained models on a truncated axis, with dashed GT-Reward marks: gains of 7.8, 6.0, and 8.2 points.">
           <a class="card-link" href="#benchmarks">Full rows in the explorer</a>
         </div>
       </div>
@@ -399,8 +399,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-18"></script>
-  <script src="static/data/results.js?v=20260819-18"></script>
-  <script src="static/js/site.js?v=20260819-18"></script>
+  <script src="static/data/content.js?v=20260819-19"></script>
+  <script src="static/data/results.js?v=20260819-19"></script>
+  <script src="static/js/site.js?v=20260819-19"></script>
 </body>
 </html>
