@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-11">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-12">
 </head>
 <body>
   <header class="site-header">
@@ -88,18 +88,36 @@
           reasoning. It needs a verified answer for every training prompt. Labels are expensive, and the
           hardest problems are the ones humans can no longer check.</p>
       </div>
-      <div class="step-grid" aria-label="The problem in three statements">
-        <div class="step-card"><span class="idx">01 · VERIFIABLE REWARDS</span>
-          <strong>RLVR depends on ground-truth supervision</strong>
-          <p>Annotation does not scale with the reasoning we now ask models to learn.</p></div>
-        <div class="step-card"><span class="idx">02 · SELF-REWARDING RL</span>
-          <strong>Self-rewarding derives the reward from the model's own completions</strong>
-          <p>TTRL uses its majority vote, Intuitor its self-certainty, RENT its predictive entropy, and
-             Co-rewarding its agreement with a copy of itself.</p></div>
-        <div class="step-card"><span class="idx">03 · THE FAILURE MODE</span>
-          <strong>The signal never leaves the model</strong>
-          <p>Self-reinforcement amplifies existing biases and can end in homogeneous outputs or training
-             collapse.</p></div>
+      <div class="finding-list" aria-label="The problem in three statements">
+        <div class="finding-row edge-violet">
+          <button class="fr-toggle" type="button" aria-expanded="false">
+            <span class="fr-num">01 / VERIFIABLE REWARDS</span>
+            <span class="fr-claim">RLVR needs a verified answer for every training prompt.</span>
+            <span class="fr-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="fr-body" hidden><p>Its strongest successes still depend heavily on ground-truth
+            supervision, and annotation does not scale with the reasoning we now ask models to learn.</p></div>
+        </div>
+        <div class="finding-row edge-blue">
+          <button class="fr-toggle" type="button" aria-expanded="false">
+            <span class="fr-num">02 / SELF-REWARDING RL</span>
+            <span class="fr-claim">Self-rewarding removes the labels by letting the model grade itself.</span>
+            <span class="fr-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="fr-body" hidden><p>The signal can be agreement with its majority-vote prediction (TTRL),
+            self-certainty (Intuitor), predictive entropy (RENT), or consistency across paraphrased inputs or
+            moving-average policies (Co-rewarding).</p></div>
+        </div>
+        <div class="finding-row edge-red">
+          <button class="fr-toggle" type="button" aria-expanded="false">
+            <span class="fr-num">03 / THE FAILURE MODE</span>
+            <span class="fr-claim">These signals never leave the model, and self-reinforcement can end in collapse.</span>
+            <span class="fr-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="fr-body" hidden><p>Without an external reference, self-reinforcement can amplify existing
+            biases, reduce response diversity, and lead to increasingly homogeneous outputs or training
+            collapse. Section 05 shows the curves.</p></div>
+        </div>
       </div>
     </section>
     </div>
@@ -138,7 +156,7 @@
              gradients.</p></div>
       </div>
 
-      <figure class="media-card">
+      <figure class="media-card fig-medium">
         <button class="media-button" type="button" data-lightbox="static/images/fig-overview.png" aria-label="Enlarge the Co-RL overview diagram">
           <img src="static/images/fig-overview.png" width="2169" height="1338" loading="lazy"
                alt="Overview of Co-RL with two agents: each agent samples K responses to the same unlabeled question, forms a majority-vote pseudo-label, and each rollout is rewarded by agreement with the peer's pseudo-label, followed by independent GRPO updates.">
@@ -181,17 +199,22 @@
           The paper pushes diversity through three channels, and each one is measurable.</p>
       </div>
 
-      <h3 class="sub-head">Decoupled policy optimization</h3>
-      <p>Each policy keeps its own parameters and optimizer state, and the only interaction is the exchanged
-        vote. Panels (b) and (c) below show that this alone stabilizes training relative to self-rewarding.</p>
-      <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
-          <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
-               alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
-        </button>
-        <figcaption>(a) Agreement between the two models, (b) pseudo-label accuracy, and (c) MATH-500 accuracy
-          during training, for the 7B pair. Click to enlarge.</figcaption>
-      </figure>
+      <div class="split">
+        <div>
+          <h3 class="sub-head">Decoupled policy optimization</h3>
+          <p>Each policy keeps its own parameters and optimizer state. The only interaction is the exchanged
+            vote. Panels (b) and (c) show that this alone stabilizes training relative to self-rewarding, and
+            panel (a) shows the two agents never collapse into agreement.</p>
+        </div>
+        <figure class="media-card">
+          <button class="media-button" type="button" data-lightbox="static/images/fig-mechanism-panels.png" aria-label="Enlarge the mechanism panels">
+            <img src="static/images/fig-mechanism-panels.png" width="2200" height="765" loading="lazy"
+                 alt="Three panels for the 7B pair during training: inter-model agreement, pseudo-label accuracy, and MATH-500 evaluation accuracy for Co-RL same family, Co-RL different family, and TTRL.">
+          </button>
+          <figcaption>(a) Agreement, (b) pseudo-label accuracy, and (c) MATH-500 accuracy during training,
+            for the 7B pair. Click to enlarge.</figcaption>
+        </figure>
+      </div>
 
       <h3 class="sub-head">Different model families and sizes</h3>
       <p>Families differ in architecture, tokenization, and pretraining data, and vision-language families
@@ -252,10 +275,18 @@
         <div id="results-note"></div>
       </div>
 
-      <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
-      <p>The tables above show endpoints. The curves below show the whole run at four scales, and several
-        self-rewarding runs collapse or diverge midway.</p>
-      <figure class="media-card">
+      <div class="split flip">
+        <div>
+          <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
+          <p>The tables above show endpoints. The curves show the whole run at four scales, and several
+            self-rewarding runs collapse or diverge midway.</p>
+          <div class="read-chips read-chips-stack" aria-label="How to read the dynamics figure">
+            <span class="read-chip"><b>RENT</b> drives reward variation toward zero with sharp length increases</span>
+            <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
+            <span class="read-chip"><b>Co-RL</b> stays stable at all four scales</span>
+          </div>
+        </div>
+        <figure class="media-card">
         <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png" aria-label="Enlarge training dynamics at four scales">
           <img src="static/images/fig-dynamics-4scale.png" width="2200" height="1579" loading="lazy"
                alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
@@ -263,10 +294,6 @@
         <figcaption>Validation accuracy, reward standard deviation, and mean completion length at four scales.
           Runs marked diverged leave the plotted range. Click to enlarge.</figcaption>
       </figure>
-      <div class="read-chips" aria-label="How to read the dynamics figure">
-        <span class="read-chip"><b>RENT</b> drives reward variation toward zero with sharp length increases</span>
-        <span class="read-chip"><b>Intuitor</b> shows degenerate completion lengths on some models</span>
-        <span class="read-chip"><b>Co-RL</b> stays stable at all four scales</span>
       </div>
       <div class="callout honesty">
         <span class="tag">Stated plainly</span>
@@ -359,8 +386,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-11"></script>
-  <script src="static/data/results.js?v=20260819-11"></script>
-  <script src="static/js/site.js?v=20260819-11"></script>
+  <script src="static/data/content.js?v=20260819-12"></script>
+  <script src="static/data/results.js?v=20260819-12"></script>
+  <script src="static/js/site.js?v=20260819-12"></script>
 </body>
 </html>

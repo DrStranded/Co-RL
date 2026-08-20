@@ -153,6 +153,36 @@ code { font-family: var(--mono); font-size: .92em; }
 }
 
 
+.pair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 20px 0; }
+.pair-grid p { margin: 0; font-size: 14.5px; color: var(--ink); line-height: 1.6; }
+.pair-grid em { color: var(--muted); font-style: normal; font-size: 13px; }
+
+/* ---------- finding rows (reference style) ---------- */
+.finding-list { display: flex; flex-direction: column; gap: 14px; margin: 26px 0 6px; }
+.finding-row { background: var(--card); border: 1px solid var(--line); border-left-width: 4px; border-radius: 4px; }
+.finding-row.edge-violet { border-left-color: var(--violet); }
+.finding-row.edge-blue { border-left-color: var(--blue); }
+.finding-row.edge-red { border-left-color: var(--red); }
+.fr-toggle {
+  display: grid; grid-template-columns: 190px minmax(0, 1fr) 24px; gap: 20px; align-items: center;
+  width: 100%; text-align: left; background: none; border: 0; cursor: pointer; padding: 20px 22px;
+}
+.fr-num { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; color: #8a6d1f; line-height: 1.5; }
+.fr-claim { font-family: var(--sans); font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.45; }
+.fr-icon { font-family: var(--mono); font-size: 19px; color: #b98524; transition: transform .18s ease; }
+.finding-row.is-open .fr-icon { transform: rotate(45deg); }
+.fr-body { padding: 0 22px 18px calc(190px + 42px); }
+.fr-body p { margin: 0; font-size: 14.5px; color: #3c4450; line-height: 1.6; }
+
+/* ---------- split rows ---------- */
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 30px; align-items: center; margin: 8px 0; }
+.split > figure { margin: 12px 0; }
+.split .sub-head { margin-top: 0; }
+.read-chips-stack { flex-direction: column; align-items: flex-start; }
+
+.fig-medium { max-width: 920px; margin-left: auto; margin-right: auto; }
+.card-fig { max-width: 440px; margin: 6px auto 0; }
+
 /* ---------- method ---------- */
 .step-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 28px 0; }
 .step-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }

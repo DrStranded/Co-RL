@@ -29,7 +29,7 @@
   function heatColor(delta) {
     const a = Math.min(Math.abs(delta) / 6, 1) * 0.42;
     if (a < 0.03) return "";
-    return delta >= 0 ? `rgba(123,80,162,${a.toFixed(2)})` : `rgba(190,55,55,${a.toFixed(2)})`;
+    return delta >= 0 ? `rgba(109,75,150,${a.toFixed(2)})` : `rgba(190,55,55,${a.toFixed(2)})`;
   }
 
   function renderResultsTable(headers, rows, label) {
@@ -73,8 +73,8 @@
       const y = 20 + i * rowH;
       const isCo = r.method.indexOf("Co-RL") === 0;
       const isGT = r.method === "GT-Reward";
-      const color = isCo ? "#7b50a2" : isGT ? "#1b222c" : "#a9b2b9";
-      svg += `<text x="${L - 10}" y="${y + 4}" text-anchor="end" font-size="12.5" fill="${isCo ? "#5d3a80" : "#3c4450"}" font-family="DM Sans, sans-serif">${esc(r.method)}</text>`;
+      const color = isCo ? "#6d4b96" : isGT ? "#1b222c" : "#a9b2b9";
+      svg += `<text x="${L - 10}" y="${y + 4}" text-anchor="end" font-size="12.5" fill="${isCo ? "#5a3d7e" : "#3c4450"}" font-family="DM Sans, sans-serif">${esc(r.method)}</text>`;
       if (isGT) {
         svg += `<line x1="${x(avgN(r))}" y1="${y - 9}" x2="${x(avgN(r))}" y2="${y + 9}" stroke="#1b222c" stroke-width="2.5" stroke-dasharray="3 3"/>`;
         const flip = x(avgN(r)) > W - 200;
@@ -185,7 +185,17 @@
     });
   }
 
+  function setupFindings() {
+    $$(".fr-toggle").forEach(btn => btn.addEventListener("click", () => {
+      const row = btn.closest(".finding-row");
+      const open = row.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open);
+      row.querySelector(".fr-body").hidden = !open;
+    }));
+  }
+
   function init() {
+    setupFindings();
     setupResults();
     setupLightbox();
     setupNav();
