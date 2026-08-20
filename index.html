@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css?v=20260819-21">
+  <link rel="stylesheet" href="static/css/site.css?v=20260819-22">
 </head>
 <body>
   <header class="site-header">
@@ -28,7 +28,6 @@
         <a href="#idea">Idea</a>
         <a href="#verdict">Results</a>
         <a href="#why">Why it works</a>
-        <a href="#benchmarks">Benchmarks</a>
         <a href="#objections">Ablations</a>
         <a href="#resources">Code</a>
         <a href="#bibtex">BibTeX</a>
@@ -109,7 +108,7 @@
           </button>
           <div class="fr-body" hidden><p>Without an external reference, self-reinforcement can amplify existing
             biases, reduce response diversity, and lead to increasingly homogeneous outputs or training
-            collapse. Section 05 shows the curves.</p></div>
+            collapse. Section 03 shows the curves.</p></div>
         </div>
       </div>
     </section>
@@ -162,7 +161,7 @@
     <!-- ================= 03 RESULTS ================= -->
     <section id="verdict" class="section-shell section-block">
       <div class="section-head">
-        <p class="eyebrow">03 / The result</p>
+        <p class="eyebrow">03 / Results</p>
         <h2>Co-RL trains without labels and matches GRPO trained with them.</h2>
         <p class="lede">GT-Reward is the same recipe with the same models, data, and budget, plus the ground
           truth. Co-RL matches or surpasses it in <span class="num">11 of 14</span> settings, and matches or
@@ -183,6 +182,50 @@
         below the reference are shown as they are. MMR1 rows use the corrected multiple-choice grader and
         open-r1 rows the legacy grader, so the two are never compared with each other.
       </p>
+    
+      <h3 class="sub-head">Full per-benchmark results</h3>
+      <p>Pick a domain and a backbone to see the full table. Violet cells sit above the Base
+        model and red cells below. Bold is the best label-free result and underline the second best, as in
+        the paper.</p>
+      <div class="panel">
+        <div class="controls-row">
+          <label>Domain
+            <select id="results-domain" aria-label="Choose a results domain">
+              <option value="text">Text LLMs</option>
+              <option value="vlm">Vision-language</option>
+              <option value="n3">Three agents</option>
+            </select>
+          </label>
+          <label id="results-backbone-label">Backbone
+            <select id="results-backbone" aria-label="Choose a backbone"></select>
+          </label>
+        </div>
+        <div class="data-table-wrap" id="results-table" aria-live="polite"></div>
+      </div>
+
+      <div class="split flip">
+        <div>
+          <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
+          <p>The tables above show endpoints. The curves show the whole run at four scales.</p>
+          <ul class="panel-keys">
+            <li><b>(a)</b>Several self-rewarding runs collapse or diverge midway. Co-RL and the labeled
+              reference hold their accuracy.</li>
+            <li><b>(b)</b>RENT drives the reward variation toward zero. Co-RL keeps it steady for the whole
+              run.</li>
+            <li><b>(c)</b>RENT shows sharp increases in completion length and Intuitor degenerates on some
+              models. Co-RL stays flat.</li>
+          </ul>
+        </div>
+        <figure class="media-card">
+        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png?v=19" aria-label="Enlarge training dynamics at four scales">
+          <img src="static/images/fig-dynamics-4scale.png?v=19" width="2200" height="1579" loading="lazy"
+               alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
+        </button>
+        <figcaption>Validation accuracy, reward standard deviation, and mean completion length at four scales.
+          Runs marked diverged leave the plotted range. Click to enlarge.</figcaption>
+      </figure>
+      </div>
+
     </section>
 
     <!-- ================= 04 WHY IT WORKS ================= -->
@@ -257,60 +300,11 @@
       <p class="answer-badge">Answer unchanged&nbsp;·&nbsp;<b>2</b></p>
     </section>
 
-    <!-- ================= 05 BENCHMARKS ================= -->
-    <section id="benchmarks" class="section-shell section-block">
-      <div class="section-head">
-        <p class="eyebrow">05 / Benchmarks</p>
-        <h2>Full per-benchmark results</h2>
-        <p class="lede">Pick a domain and a backbone to see the full table. Violet cells sit above the Base
-          model and red cells below. Bold is the best label-free result and underline the second best, as in
-          the paper.</p>
-      </div>
-      <div class="panel">
-        <div class="controls-row">
-          <label>Domain
-            <select id="results-domain" aria-label="Choose a results domain">
-              <option value="text">Text LLMs</option>
-              <option value="vlm">Vision-language</option>
-              <option value="n3">Three agents</option>
-            </select>
-          </label>
-          <label id="results-backbone-label">Backbone
-            <select id="results-backbone" aria-label="Choose a backbone"></select>
-          </label>
-        </div>
-        <div class="data-table-wrap" id="results-table" aria-live="polite"></div>
-      </div>
-
-      <div class="split flip">
-        <div>
-          <h3 class="sub-head">Co-RL also trains stably where self-rewarding degenerates</h3>
-          <p>The tables above show endpoints. The curves show the whole run at four scales.</p>
-          <ul class="panel-keys">
-            <li><b>(a)</b>Several self-rewarding runs collapse or diverge midway. Co-RL and the labeled
-              reference hold their accuracy.</li>
-            <li><b>(b)</b>RENT drives the reward variation toward zero. Co-RL keeps it steady for the whole
-              run.</li>
-            <li><b>(c)</b>RENT shows sharp increases in completion length and Intuitor degenerates on some
-              models. Co-RL stays flat.</li>
-          </ul>
-        </div>
-        <figure class="media-card">
-        <button class="media-button" type="button" data-lightbox="static/images/fig-dynamics-4scale.png?v=19" aria-label="Enlarge training dynamics at four scales">
-          <img src="static/images/fig-dynamics-4scale.png?v=19" width="2200" height="1579" loading="lazy"
-               alt="Training dynamics at four model scales: validation accuracy, within-group reward standard deviation, and mean completion length for Co-RL, GT-Reward, TTRL, RENT, and Intuitor. Self-rewarding baselines show reward collapse, length degeneration, or divergence. Co-RL stays stable.">
-        </button>
-        <figcaption>Validation accuracy, reward standard deviation, and mean completion length at four scales.
-          Runs marked diverged leave the plotted range. Click to enlarge.</figcaption>
-      </figure>
-      </div>
-
-    </section>
 
     <!-- ================= 06 OBJECTIONS ================= -->
     <section id="objections" class="section-shell section-block">
       <div class="section-head">
-        <p class="eyebrow">06 / Ablations</p>
+        <p class="eyebrow">05 / Ablations</p>
         <h2>Three deeper ablations</h2>
       </div>
       <div class="cards-3">
@@ -343,7 +337,7 @@
              and match or beat their labeled references.</p>
           <img src="static/images/fig-abl-n3.png?v=19" width="1088" height="648" loading="lazy" class="card-fig"
                alt="Vertical grouped bars from Base to Co-RL for the three ring-trained models on a truncated axis, with dashed GT-Reward marks: gains of 7.8, 6.0, and 8.2 points.">
-          <a class="card-link" href="#benchmarks">Full rows in the explorer</a>
+          <a class="card-link" href="#verdict">Full rows in the explorer</a>
         </div>
       </div>
     </section>
@@ -351,7 +345,7 @@
     <!-- ================= 07 RUN IT ================= -->
     <section id="resources" class="section-shell section-block">
       <div class="section-head">
-        <p class="eyebrow">07 / Code</p>
+        <p class="eyebrow">06 / Code</p>
         <h2>The code is public.</h2>
         <p class="lede">The release is Apache-2.0. Every setting on this page has a launcher in
           <a href="https://github.com/DrStranded/Co-RL" target="_blank" rel="noreferrer">the repository</a>,
@@ -391,8 +385,8 @@
     </div>
   </footer>
 
-  <script src="static/data/content.js?v=20260819-21"></script>
-  <script src="static/data/results.js?v=20260819-21"></script>
-  <script src="static/js/site.js?v=20260819-21"></script>
+  <script src="static/data/content.js?v=20260819-22"></script>
+  <script src="static/data/results.js?v=20260819-22"></script>
+  <script src="static/js/site.js?v=20260819-22"></script>
 </body>
 </html>
