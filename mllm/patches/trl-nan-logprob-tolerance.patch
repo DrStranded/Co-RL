@@ -3,7 +3,7 @@ Fill NaN sampling logprobs with the sequence mean instead of crashing the run
 
 --- a/trl/trainer/grpo_trainer.py
 +++ b/trl/trainer/grpo_trainer.py
-@@ -1900,6 +1900,21 @@
+@@ -1900,6 +1900,23 @@
              completion_mask, padding_value=0, padding_side="right", pad_to_multiple_of=self.pad_to_multiple_of
          ).to(device=device)
          if sampling_per_token_logps_list is not None:

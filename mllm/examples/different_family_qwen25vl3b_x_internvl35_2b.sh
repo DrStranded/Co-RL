@@ -2,7 +2,7 @@
 # open_r1, heter co-learn, A=Qwen/Qwen2.5-VL-3B-Instruct (flash_attention_2) x B=OpenGVLab/InternVL3_5-2B-HF (flash_attention_2)
 # the pinned stack (torch2.9/vllm0.11.2/tf4.57.0/ds0.18), ZeRO-3+optim-offload, 4+4 GPUs.
 # Requires the environment active + MLLM_ENV_READY=1. bs/ga/vllm/steps overridable via env.
-# smoke: MAX_STEPS=1 MAX_SAMPLES=64 bash examples/heter_qwen25vl7b_x_internvl35_8b_openr1.sh
+# smoke: MAX_STEPS=1 MAX_SAMPLES=64 bash examples/different_family_qwen25vl3b_x_internvl35_2b.sh
 # Illustrative settings, not the paper's configuration: a smaller model pair, a
 # short rollout budget, and a step cap. See the paper for the reported setup.
 set -euo pipefail

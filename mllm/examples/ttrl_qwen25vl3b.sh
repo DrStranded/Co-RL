@@ -3,7 +3,7 @@
 # Requires the environment active + MLLM_ENV_READY=1.
 # NOTE small tier: ZeRO-3 WITHOUT optimizer offload, EB=64 via bs=1 x ga=8 x 8gpu, vllm_mem 0.45, attn=flash_attention_2.
 # Dataset is chosen by MLLM_PRE_DIR (openr1_8k vs mmr1_8k) -- see README.
-# smoke: MAX_STEPS=1 MAX_SAMPLES=64 bash examples/openr1_qwen25vl3b_ttrl.sh
+# smoke: MAX_STEPS=1 MAX_SAMPLES=64 bash examples/ttrl_qwen25vl3b.sh
 # Illustrative settings, not the paper's configuration: a smaller model pair, a
 # short rollout budget, and a step cap. See the paper for the reported setup.
 set -euo pipefail

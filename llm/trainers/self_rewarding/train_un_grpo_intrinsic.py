@@ -30,6 +30,7 @@ from transformers import AutoTokenizer
 from transformers.modeling_utils import PreTrainedModel as _PreTrainedModel
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "co_rl"))  # shared dataset / verifiers
 from intrinsic_rewards import make_reward_entropy, make_reward_self_certainty
 from intrinsic_trainer import IntrinsicRewardTrainer
 from dataset import DAPO_DATASET, MATH_LEVEL12345_DATASET, MATH_LEVEL345_DATASET, OPSD_DATASET, load_dataset

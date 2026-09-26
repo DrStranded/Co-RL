@@ -5,7 +5,7 @@
 # short rollout budget, and a step cap so the run finishes quickly on 4 GPUs.
 # The configuration behind the reported numbers is given in the paper.
 # Requires the environment active + LLM_ENV_READY=1. Llama is gated: accept its HF license first.
-# smoke: MAX_STEPS=1 bash examples/heter_qwen25_3b_x_llama32_3b.sh
+# smoke: MAX_STEPS=1 bash examples/different_family_qwen25_1p5b_x_llama32_1b.sh
 set -euo pipefail
 [ "${LLM_ENV_READY:-0}" = "1" ] || { echo "[llm] ERROR: env not activated (see README)." >&2; exit 1; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"; cd "$REPO_ROOT"

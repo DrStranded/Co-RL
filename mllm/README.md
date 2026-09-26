@@ -49,8 +49,8 @@ bash examples/ttrl_qwen25vl3b.sh                    # TTRL baseline
 bash examples/different_family_qwen25vl3b_x_internvl35_2b.sh   # Co-RL (Different family)
 ```
 
-Every run uses an effective batch of 64 prompts per step, 8 rollouts per
-prompt, 1 epoch, seed 42.
+Every run uses 64 completions per optimizer step (8 prompts x 8 rollouts), 1 epoch,
+seed 42.
 
 ## 📊 Evaluation
 

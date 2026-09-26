@@ -6,14 +6,13 @@ Set MATH500_EVAL_PATH=data/math500/test.json (relative to repo root) to use
 the MATH-500 validation set (industry standard, used by MARTI / SimpleRL-Zoo).
 Without this env var, a 150-prompt holdout is carved from the train split.
 
-Co-rewarding-I replication uses a private HF dataset with two row-aligned configs
+Co-rewarding-I replication uses an HF dataset with two row-aligned configs
 (q1716523669/MATH-Level345-Rephrased-DeepSeek):
   - config 'original'  (MATH-Level345 questions, verl format)
   - config 'rephrased' (same rows positionally, DeepSeek-rephrased; semantically
                         equivalent question + identical answer)
 Both configs share schema and are aligned by row index (extra_info.index). Override
-the repo via the COREWARDING_HF_REPO env var. The dataset is private, so HF_TOKEN
-must be set in the environment at load time.
+the repo via the COREWARDING_HF_REPO env var.
 """
 
 import json
@@ -107,7 +106,6 @@ def _load_coreward(which: str) -> Dataset:
     dicts (system + user); we extract the user content, drop the verl system message (its
     'reason step by step + boxed' instruction is duplicated by our own _INSTRUCTION), and
     wrap via _make_prompt. `solution` is taken from `reward_model.ground_truth` (string).
-    The dataset is private, so HF_TOKEN must be set in the environment.
     """
     hf = hf_load_dataset(_COREWARDING_HF_REPO, which, split="train",
                          token=os.environ.get("HF_TOKEN"))
