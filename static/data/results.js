@@ -1,13 +1,15 @@
 // Co-RL project page — result data.
-// GENERATED from the paper's LaTeX tables (neurips_2026.tex + appendix.tex) by extract_tables.py
-// + normalize.py. Do not edit numbers by hand; regenerate from the .tex source.
+// GENERATED from the paper's LaTeX tables (ICLR 2027 submission: main tex Tables 1-3, appendix Tables 5-10) by build_results.py.
+// Do not edit numbers by hand; regenerate from the .tex source.
 // Values are STRINGS carrying the paper's exact formatting; parseFloat() before arithmetic.
-// marks: "b" = bold (best label-free), "u" = underline (second best), "" = none.
-// HARD PARTITION: vlmSmall blocks are keyed by (backbone, dataset). MMR1 uses the corrected
-// multiple-choice grader and open-r1 the legacy grader, so the two datasets are NEVER
-// compared with each other, and the UI must never place them side by side.
-// The CoMAS table uses CoMAS's suite/driver/graders; ensemble tables use maj@8 at T=0.6.
-// Neither shares an axis with the seven-benchmark tables.
+// marks: "b" = bold (best label-free), "u" = underline (second best), "" = none; ties share the marking.
+// llmMain shows nine rows per backbone; Table 1 prints only Co-RL+, and the Same family / Different family rows
+// come from the paper source (their seven-benchmark averages are the ones plotted in Figure 4), so the marks in
+// llmMain are recomputed over the seven label-free rows shown here. The other table blocks carry the paper's own marks;
+// decPool / decAnchor carry values only (no marks field).
+// All vision-language rows share one evaluation protocol (Appendix F.5); open-r1 and MMR1 are comparable.
+// The CoMAS table uses CoMAS's suite/driver/graders; the MM-UPT table uses MM-UPT's protocol; ensemble tables use maj@8 at T=0.6.
+// None of these shares an axis with the seven-benchmark tables.
 window.siteResults = {
   "benchText": [
     "GSM8K",
@@ -34,14 +36,14 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "73.4",
-            "56.6",
-            "28.9",
-            "39.0",
+            "71.4",
+            "55.8",
+            "25.9",
+            "56.1",
             "21.2",
-            "52.2",
+            "50.8",
             "13.7",
-            "40.7"
+            "42.1"
           ],
           "marks": [
             "",
@@ -216,7 +218,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family+)",
+          "method": "Co-RL+",
           "vals": [
             "81.0",
             "66.6",
@@ -429,7 +431,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family+)",
+          "method": "Co-RL+",
           "vals": [
             "78.4",
             "55.2",
@@ -455,7 +457,7 @@ window.siteResults = {
     },
     {
       "backbone": "Qwen2.5-7B",
-      "tier": "7B/8B",
+      "tier": "7B",
       "rows": [
         {
           "method": "Base",
@@ -463,11 +465,11 @@ window.siteResults = {
             "82.9",
             "70.0",
             "39.8",
-            "47.6",
+            "73.4",
             "18.7",
             "62.8",
             "21.1",
-            "49.0"
+            "52.7"
           ],
           "marks": [
             "",
@@ -486,11 +488,11 @@ window.siteResults = {
             "84.8",
             "77.6",
             "49.4",
-            "56.1",
+            "80.7",
             "23.7",
             "64.4",
             "25.5",
-            "54.5"
+            "58.0"
           ],
           "marks": [
             "",
@@ -509,11 +511,11 @@ window.siteResults = {
             "80.6",
             "74.8",
             "39.8",
-            "51.8",
+            "75.6",
             "25.8",
             "65.4",
             "23.9",
-            "51.7"
+            "55.1"
           ],
           "marks": [
             "",
@@ -532,11 +534,11 @@ window.siteResults = {
             "78.8",
             "75.4",
             "47.0",
-            "50.6",
+            "75.4",
             "29.8",
             "61.6",
             "26.2",
-            "52.8"
+            "56.3"
           ],
           "marks": [
             "",
@@ -555,11 +557,11 @@ window.siteResults = {
             "82.9",
             "75.4",
             "41.0",
-            "51.8",
+            "78.9",
             "28.3",
             "64.0",
             "24.8",
-            "52.6"
+            "56.5"
           ],
           "marks": [
             "b",
@@ -578,11 +580,11 @@ window.siteResults = {
             "81.9",
             "72.6",
             "43.4",
-            "52.4",
+            "79.9",
             "26.8",
             "64.0",
             "25.9",
-            "52.4"
+            "56.4"
           ],
           "marks": [
             "u",
@@ -601,17 +603,17 @@ window.siteResults = {
             "78.9",
             "74.6",
             "41.0",
-            "52.4",
+            "81.1",
             "25.8",
             "61.8",
             "25.0",
-            "51.4"
+            "55.5"
           ],
           "marks": [
             "",
             "",
             "",
-            "u",
+            "b",
             "",
             "",
             "",
@@ -624,17 +626,17 @@ window.siteResults = {
             "81.3",
             "75.2",
             "44.6",
-            "52.4",
+            "78.1",
             "26.3",
             "65.6",
             "26.5",
-            "53.1"
+            "56.8"
           ],
           "marks": [
             "",
             "u",
             "u",
-            "u",
+            "",
             "",
             "b",
             "u",
@@ -642,22 +644,22 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family+)",
+          "method": "Co-RL+",
           "vals": [
             "80.2",
             "74.4",
             "38.6",
-            "54.3",
+            "79.7",
             "37.9",
             "63.2",
             "26.6",
-            "53.6"
+            "57.2"
           ],
           "marks": [
             "",
             "",
             "",
-            "b",
+            "",
             "b",
             "",
             "b",
@@ -668,7 +670,7 @@ window.siteResults = {
     },
     {
       "backbone": "Llama-3.1-8B-Instruct",
-      "tier": "7B/8B",
+      "tier": "8B",
       "rows": [
         {
           "method": "Base",
@@ -855,7 +857,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family+)",
+          "method": "Co-RL+",
           "vals": [
             "85.4",
             "55.6",
@@ -887,14 +889,14 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "73.4",
-            "56.6",
-            "28.9",
-            "39.0",
+            "71.4",
+            "55.8",
+            "25.9",
+            "56.1",
             "21.2",
-            "52.2",
+            "50.8",
             "13.7",
-            "40.7"
+            "42.1"
           ],
           "marks": [
             "",
@@ -954,7 +956,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
             "79.8",
             "66.3",
@@ -1051,7 +1053,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
             "77.8",
             "54.2",
@@ -1148,7 +1150,7 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
             "69.3",
             "67.6",
@@ -1156,7 +1158,7 @@ window.siteResults = {
             "64.2",
             "27.1",
             "54.6",
-            "15.3",
+            "15.8",
             "47.3"
           ],
           "marks": [
@@ -1171,169 +1173,215 @@ window.siteResults = {
           ]
         }
       ]
+    },
+    {
+      "model": "Phi-4-mini-Instruct",
+      "rows": [
+        {
+          "method": "Base",
+          "vals": [
+            "80.7",
+            "68.4",
+            "33.9",
+            "72.6",
+            "19.7",
+            "51.4",
+            "14.3",
+            "48.7"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "84.9",
+            "74.4",
+            "36.9",
+            "73.8",
+            "21.2",
+            "54.8",
+            "13.5",
+            "51.4"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "84.6",
+            "72.8",
+            "36.3",
+            "77.4",
+            "23.7",
+            "54.6",
+            "10.0",
+            "51.4"
+          ],
+          "marks": [
+            "u",
+            "b",
+            "u",
+            "b",
+            "u",
+            "u",
+            "u",
+            "u"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
+            "86.4",
+            "71.8",
+            "38.9",
+            "72.0",
+            "30.3",
+            "55.4",
+            "13.7",
+            "52.6"
+          ],
+          "marks": [
+            "b",
+            "u",
+            "b",
+            "u",
+            "b",
+            "b",
+            "b",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Granite-3.3-2B-Instruct",
+      "rows": [
+        {
+          "method": "Base",
+          "vals": [
+            "63.5",
+            "54.6",
+            "24.1",
+            "32.9",
+            "25.8",
+            "45.0",
+            "10.3",
+            "36.6"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "73.6",
+            "56.8",
+            "23.2",
+            "45.1",
+            "20.7",
+            "46.0",
+            "10.7",
+            "39.5"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "70.4",
+            "59.8",
+            "26.1",
+            "34.8",
+            "24.2",
+            "45.6",
+            "11.0",
+            "38.8"
+          ],
+          "marks": [
+            "u",
+            "b",
+            "b",
+            "u",
+            "u",
+            "u",
+            "u",
+            "u"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
+            "72.9",
+            "59.2",
+            "23.2",
+            "42.1",
+            "26.8",
+            "46.8",
+            "11.2",
+            "40.3"
+          ],
+          "marks": [
+            "b",
+            "u",
+            "u",
+            "b",
+            "b",
+            "b",
+            "b",
+            "b"
+          ]
+        }
+      ]
     }
   ],
   "vlmSmall": [
     {
-      "backbone": "InternVL-3.5-2B",
-      "dataset": "open-r1",
-      "rows": [
-        {
-          "method": "GT-Reward",
-          "vals": [
-            "26.55",
-            "35.33",
-            "59.60",
-            "59.31",
-            "45.20"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "Base",
-          "vals": [
-            "24.77",
-            "34.21",
-            "55.60",
-            "57.87",
-            "43.11"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "TTRL",
-          "vals": [
-            "25.86",
-            "34.24",
-            "57.60",
-            "62.47",
-            "45.04"
-          ],
-          "marks": [
-            "u",
-            "u",
-            "u",
-            "b",
-            "u"
-          ]
-        },
-        {
-          "method": "Co-RL (Different family)",
-          "vals": [
-            "26.25",
-            "34.92",
-            "58.90",
-            "61.55",
-            "45.40"
-          ],
-          "marks": [
-            "b",
-            "b",
-            "b",
-            "u",
-            "b"
-          ]
-        }
-      ]
-    },
-    {
-      "backbone": "InternVL-3.5-2B",
-      "dataset": "MMR1",
-      "rows": [
-        {
-          "method": "GT-Reward",
-          "vals": [
-            "25.99",
-            "34.37",
-            "59.00",
-            "59.25",
-            "44.65"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "Base",
-          "vals": [
-            "24.77",
-            "34.21",
-            "55.60",
-            "57.87",
-            "43.11"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "TTRL",
-          "vals": [
-            "26.38",
-            "35.36",
-            "57.70",
-            "61.78",
-            "45.30"
-          ],
-          "marks": [
-            "b",
-            "b",
-            "u",
-            "b",
-            "b"
-          ]
-        },
-        {
-          "method": "Co-RL (Different family)",
-          "vals": [
-            "26.05",
-            "34.80",
-            "58.60",
-            "61.15",
-            "45.15"
-          ],
-          "marks": [
-            "u",
-            "u",
-            "b",
-            "u",
-            "u"
-          ]
-        }
-      ]
-    },
-    {
       "backbone": "Qwen2.5-VL-3B",
       "dataset": "open-r1",
       "rows": [
         {
           "method": "GT-Reward",
           "vals": [
-            "21.71",
-            "31.29",
-            "60.90",
-            "57.99",
-            "42.97"
+            "24.37",
+            "40.10",
+            "51.70",
+            "54.83",
+            "42.75"
           ],
           "marks": [
             "",
@@ -1346,102 +1394,28 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "18.55",
-            "26.04",
-            "52.70",
-            "51.67",
-            "37.24"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "TTRL",
-          "vals": [
-            "21.15",
-            "30.05",
-            "57.40",
-            "61.55",
-            "42.54"
-          ],
-          "marks": [
-            "u",
-            "u",
-            "u",
-            "u",
-            "u"
-          ]
-        },
-        {
-          "method": "Co-RL (Different family)",
-          "vals": [
-            "21.94",
-            "30.48",
-            "60.20",
-            "62.93",
-            "43.89"
-          ],
-          "marks": [
-            "b",
-            "b",
-            "b",
-            "b",
-            "b"
-          ]
-        }
-      ]
-    },
-    {
-      "backbone": "Qwen2.5-VL-3B",
-      "dataset": "MMR1",
-      "rows": [
-        {
-          "method": "GT-Reward",
-          "vals": [
-            "19.57",
-            "27.34",
-            "59.40",
-            "57.82",
-            "41.03"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "Base",
-          "vals": [
-            "18.55",
-            "26.04",
-            "52.70",
-            "51.67",
-            "37.24"
-          ],
-          "marks": [
-            "",
-            "",
-            "",
-            "",
-            ""
-          ]
-        },
-        {
-          "method": "TTRL",
-          "vals": [
-            "17.99",
-            "24.72",
-            "56.30",
+            "23.72",
+            "37.34",
+            "44.90",
             "52.87",
-            "37.97"
+            "39.71"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "23.13",
+            "38.43",
+            "51.70",
+            "56.44",
+            "42.42"
           ],
           "marks": [
             "u",
@@ -1452,13 +1426,13 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
-            "21.05",
-            "28.91",
-            "57.20",
-            "57.30",
-            "41.12"
+            "23.65",
+            "38.81",
+            "53.70",
+            "57.36",
+            "43.38"
           ],
           "marks": [
             "b",
@@ -1466,6 +1440,228 @@ window.siteResults = {
             "b",
             "b",
             "b"
+          ]
+        }
+      ]
+    },
+    {
+      "backbone": "Qwen2.5-VL-3B",
+      "dataset": "MMR1",
+      "rows": [
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "24.51",
+            "39.87",
+            "53.00",
+            "58.91",
+            "44.07"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "Base",
+          "vals": [
+            "23.72",
+            "37.34",
+            "44.90",
+            "52.87",
+            "39.71"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "22.34",
+            "36.42",
+            "51.10",
+            "55.63",
+            "41.37"
+          ],
+          "marks": [
+            "u",
+            "u",
+            "u",
+            "u",
+            "u"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
+            "23.09",
+            "38.20",
+            "52.20",
+            "58.05",
+            "42.88"
+          ],
+          "marks": [
+            "b",
+            "b",
+            "b",
+            "b",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "backbone": "InternVL3.5-2B",
+      "dataset": "open-r1",
+      "rows": [
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "26.58",
+            "45.05",
+            "60.70",
+            "60.11",
+            "48.11"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "Base",
+          "vals": [
+            "24.14",
+            "42.11",
+            "50.30",
+            "57.41",
+            "43.49"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "25.66",
+            "44.44",
+            "60.10",
+            "59.71",
+            "47.48"
+          ],
+          "marks": [
+            "u",
+            "b",
+            "u",
+            "u",
+            "u"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
+            "26.64",
+            "43.15",
+            "60.90",
+            "60.80",
+            "47.87"
+          ],
+          "marks": [
+            "b",
+            "u",
+            "b",
+            "b",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "backbone": "InternVL3.5-2B",
+      "dataset": "MMR1",
+      "rows": [
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "26.94",
+            "44.34",
+            "60.40",
+            "59.43",
+            "47.78"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "Base",
+          "vals": [
+            "24.14",
+            "42.11",
+            "50.30",
+            "57.41",
+            "43.49"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "26.35",
+            "44.31",
+            "60.50",
+            "60.57",
+            "47.93"
+          ],
+          "marks": [
+            "u",
+            "u",
+            "b",
+            "u",
+            "b"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
+            "26.78",
+            "44.87",
+            "58.70",
+            "60.69",
+            "47.76"
+          ],
+          "marks": [
+            "b",
+            "b",
+            "u",
+            "b",
+            "u"
           ]
         }
       ]
@@ -1479,11 +1675,85 @@ window.siteResults = {
         {
           "method": "GT-Reward",
           "vals": [
+            "27.34",
+            "47.13",
+            "69.50",
+            "65.98",
+            "52.49"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "Base",
+          "vals": [
+            "26.35",
+            "46.04",
+            "69.80",
+            "65.52",
+            "51.93"
+          ],
+          "marks": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "method": "TTRL",
+          "vals": [
+            "17.01",
+            "42.34",
+            "67.10",
+            "65.34",
+            "47.95"
+          ],
+          "marks": [
+            "u",
+            "u",
+            "u",
+            "u",
+            "u"
+          ]
+        },
+        {
+          "method": "Co-RL",
+          "vals": [
             "26.74",
-            "41.07",
-            "71.90",
-            "67.01",
-            "51.68"
+            "49.26",
+            "71.30",
+            "70.40",
+            "54.42"
+          ],
+          "marks": [
+            "b",
+            "b",
+            "b",
+            "b",
+            "b"
+          ]
+        }
+      ]
+    },
+    {
+      "backbone": "Qwen2.5-VL-7B",
+      "dataset": "MMR1",
+      "rows": [
+        {
+          "method": "GT-Reward",
+          "vals": [
+            "28.62",
+            "48.60",
+            "67.80",
+            "68.85",
+            "53.47"
           ],
           "marks": [
             "",
@@ -1496,11 +1766,11 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "23.36",
-            "33.32",
-            "56.60",
-            "62.47",
-            "43.94"
+            "26.35",
+            "46.04",
+            "69.80",
+            "65.52",
+            "51.93"
           ],
           "marks": [
             "",
@@ -1513,11 +1783,11 @@ window.siteResults = {
         {
           "method": "TTRL",
           "vals": [
-            "23.62",
-            "37.26",
-            "69.40",
+            "27.01",
+            "45.18",
+            "70.70",
             "65.23",
-            "48.88"
+            "52.03"
           ],
           "marks": [
             "u",
@@ -1528,13 +1798,13 @@ window.siteResults = {
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
-            "26.87",
-            "38.43",
-            "71.00",
-            "68.22",
-            "51.13"
+            "27.70",
+            "48.27",
+            "71.30",
+            "66.95",
+            "53.56"
           ],
           "marks": [
             "b",
@@ -1547,17 +1817,17 @@ window.siteResults = {
       ]
     },
     {
-      "backbone": "InternVL-3.5-8B",
+      "backbone": "InternVL3.5-8B",
       "dataset": "open-r1",
       "rows": [
         {
           "method": "GT-Reward",
           "vals": [
-            "37.24",
-            "43.35",
-            "69.30",
-            "73.51",
-            "55.85"
+            "59.70",
+            "70.81",
+            "77.60",
+            "83.74",
+            "72.96"
           ],
           "marks": [
             "",
@@ -1570,11 +1840,11 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "29.21",
-            "36.65",
-            "65.70",
-            "60.69",
-            "48.06"
+            "57.66",
+            "68.78",
+            "77.10",
+            "82.18",
+            "71.43"
           ],
           "marks": [
             "",
@@ -1587,51 +1857,51 @@ window.siteResults = {
         {
           "method": "TTRL",
           "vals": [
-            "35.07",
-            "41.24",
-            "68.60",
-            "71.72",
-            "54.16"
+            "60.07",
+            "71.78",
+            "77.20",
+            "83.74",
+            "73.20"
           ],
           "marks": [
             "u",
             "b",
             "u",
             "b",
-            "u"
+            "b"
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
-            "35.30",
-            "40.74",
-            "70.60",
-            "70.98",
-            "54.40"
+            "60.23",
+            "70.74",
+            "78.40",
+            "82.82",
+            "73.05"
           ],
           "marks": [
             "b",
             "u",
             "b",
             "u",
-            "b"
+            "u"
           ]
         }
       ]
     },
     {
-      "backbone": "Gemma-3-12B",
-      "dataset": "open-r1",
+      "backbone": "InternVL3.5-8B",
+      "dataset": "MMR1",
       "rows": [
         {
           "method": "GT-Reward",
           "vals": [
-            "30.89",
-            "33.63",
-            "56.90",
-            "59.25",
-            "45.17"
+            "62.43",
+            "71.80",
+            "77.50",
+            "84.14",
+            "73.97"
           ],
           "marks": [
             "",
@@ -1644,11 +1914,11 @@ window.siteResults = {
         {
           "method": "Base",
           "vals": [
-            "27.20",
-            "32.70",
-            "46.70",
-            "60.50",
-            "41.78"
+            "57.66",
+            "68.78",
+            "77.10",
+            "82.18",
+            "71.43"
           ],
           "marks": [
             "",
@@ -1661,32 +1931,32 @@ window.siteResults = {
         {
           "method": "TTRL",
           "vals": [
-            "27.93",
-            "36.37",
-            "54.70",
-            "58.79",
-            "44.45"
+            "62.01",
+            "70.94",
+            "77.80",
+            "84.14",
+            "73.72"
           ],
           "marks": [
-            "u",
             "b",
+            "u",
             "u",
             "u",
             "u"
           ]
         },
         {
-          "method": "Co-RL (Different family)",
+          "method": "Co-RL",
           "vals": [
-            "32.01",
-            "35.91",
-            "55.60",
-            "66.72",
-            "47.56"
+            "61.38",
+            "71.52",
+            "78.80",
+            "85.11",
+            "74.20"
           ],
           "marks": [
-            "b",
             "u",
+            "b",
             "b",
             "b",
             "b"
@@ -1800,10 +2070,10 @@ window.siteResults = {
         ]
       },
       {
-        "method": "Co-RL (Different family)",
+        "method": "Co-RL",
         "vals": [
-          "89.5",
-          "68.6",
+          "89.50",
+          "68.60",
           "82.32",
           "68.00",
           "65.80",
@@ -1824,9 +2094,173 @@ window.siteResults = {
       }
     ]
   },
+  "mmupt": {
+    "header": [
+      "MathVision",
+      "MathVerse",
+      "MathVista",
+      "We-Math",
+      "Avg"
+    ],
+    "rows": [
+      {
+        "method": "Base",
+        "vals": [
+          "24.87",
+          "43.83",
+          "66.30",
+          "62.87",
+          "49.47"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "GRPO",
+        "vals": [
+          "29.01",
+          "45.03",
+          "71.40",
+          "67.24",
+          "53.17"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "SFT",
+        "vals": [
+          "26.45",
+          "43.53",
+          "63.30",
+          "64.20",
+          "49.37"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "SRLM",
+        "vals": [
+          "25.33",
+          "45.08",
+          "67.00",
+          "64.66",
+          "50.52"
+        ],
+        "marks": [
+          "",
+          "u",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "LMSI",
+        "vals": [
+          "24.83",
+          "43.76",
+          "64.90",
+          "66.38",
+          "49.97"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "Genixer",
+        "vals": [
+          "23.68",
+          "43.30",
+          "65.50",
+          "64.66",
+          "49.29"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "STIC",
+        "vals": [
+          "23.78",
+          "42.72",
+          "66.10",
+          "63.74",
+          "49.09"
+        ],
+        "marks": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "method": "MM-UPT",
+        "vals": [
+          "26.15",
+          "44.87",
+          "72.90",
+          "68.74",
+          "53.17"
+        ],
+        "marks": [
+          "u",
+          "",
+          "u",
+          "u",
+          "u"
+        ]
+      },
+      {
+        "method": "Co-RL",
+        "vals": [
+          "28.06",
+          "48.68",
+          "73.30",
+          "70.80",
+          "55.21"
+        ],
+        "marks": [
+          "b",
+          "b",
+          "b",
+          "b",
+          "b"
+        ]
+      }
+    ]
+  },
   "ensLLM": [
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "TTRL (Qwen2.5-3B)",
       "vals": [
         "88.2",
@@ -1842,7 +2276,7 @@ window.siteResults = {
       ]
     },
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "TTRL (Llama-3.2-3B)",
       "vals": [
         "65.7",
@@ -1858,7 +2292,7 @@ window.siteResults = {
       ]
     },
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "TTRL (ensemble)",
       "vals": [
         "88.2",
@@ -1874,7 +2308,7 @@ window.siteResults = {
       ]
     },
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "Co-RL (Qwen2.5-3B)",
       "vals": [
         "87.4",
@@ -1890,7 +2324,7 @@ window.siteResults = {
       ]
     },
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "Co-RL (Llama-3.2-3B)",
       "vals": [
         "87.3",
@@ -1906,7 +2340,7 @@ window.siteResults = {
       ]
     },
     {
-      "group": null,
+      "group": "Qwen2.5-3B with Llama-3.2-3B-Instruct",
       "setting": "Co-RL (ensemble)",
       "vals": [
         "90.1",
@@ -1919,6 +2353,102 @@ window.siteResults = {
         "u",
         "b",
         "b"
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "TTRL (Qwen2.5-7B)",
+      "vals": [
+        "88.3",
+        "80.2",
+        "44.6",
+        "71.0"
+      ],
+      "marks": [
+        "",
+        "b",
+        "",
+        ""
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "TTRL (Llama-3.1-8B)",
+      "vals": [
+        "87.0",
+        "59.6",
+        "34.9",
+        "60.5"
+      ],
+      "marks": [
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "TTRL (ensemble)",
+      "vals": [
+        "89.5",
+        "76.4",
+        "43.4",
+        "69.7"
+      ],
+      "marks": [
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "Co-RL (Qwen2.5-7B)",
+      "vals": [
+        "90.8",
+        "80.0",
+        "48.2",
+        "73.0"
+      ],
+      "marks": [
+        "b",
+        "u",
+        "u",
+        "b"
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "Co-RL (Llama-3.1-8B)",
+      "vals": [
+        "87.8",
+        "62.0",
+        "41.0",
+        "63.6"
+      ],
+      "marks": [
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "group": "Qwen2.5-7B with Llama-3.1-8B-Instruct",
+      "setting": "Co-RL (ensemble)",
+      "vals": [
+        "90.6",
+        "76.8",
+        "49.4",
+        "72.3"
+      ],
+      "marks": [
+        "u",
+        "",
+        "b",
+        "u"
       ]
     }
   ],
@@ -2144,7 +2674,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "different family",
-      "pair": "Llama-3.2-3B \u00d7 Phi-3.5-mini",
+      "pair": "Llama-3.2-3B × Phi-3.5-mini",
       "kappa": 0.31,
       "c": 32.8,
       "w": 3.0,
@@ -2153,7 +2683,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "different family",
-      "pair": "Qwen2.5-3B \u00d7 Llama-3.2-3B",
+      "pair": "Qwen2.5-3B × Llama-3.2-3B",
       "kappa": 0.38,
       "c": 31.2,
       "w": 2.4,
@@ -2162,7 +2692,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "different family",
-      "pair": "Qwen2.5-3B \u00d7 Phi-3.5-mini",
+      "pair": "Qwen2.5-3B × Phi-3.5-mini",
       "kappa": 0.38,
       "c": 31.2,
       "w": 4.0,
@@ -2171,7 +2701,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "different family",
-      "pair": "Qwen2.5-3B \u00d7 MiniCPM3-4B",
+      "pair": "Qwen2.5-3B × MiniCPM3-4B",
       "kappa": 0.41,
       "c": 29.4,
       "w": 4.4,
@@ -2180,7 +2710,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "same family",
-      "pair": "Qwen2.5-3B \u00d7 Qwen3-1.7B-Base",
+      "pair": "Qwen2.5-3B × Qwen3-1.7B-Base",
       "kappa": 0.52,
       "c": 24.2,
       "w": 4.2,
@@ -2189,7 +2719,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "seed only",
-      "pair": "Qwen3-1.7B-Base \u00d7 itself",
+      "pair": "Qwen3-1.7B-Base × itself",
       "kappa": 0.52,
       "c": 24.0,
       "w": 5.0,
@@ -2198,7 +2728,7 @@ window.siteResults = {
     {
       "tier": "3B tier",
       "level": "seed only",
-      "pair": "Qwen2.5-3B \u00d7 itself",
+      "pair": "Qwen2.5-3B × itself",
       "kappa": 0.56,
       "c": 22.0,
       "w": 4.4,
@@ -2207,7 +2737,7 @@ window.siteResults = {
     {
       "tier": "7B tier",
       "level": "different family",
-      "pair": "Qwen2.5-7B \u00d7 Llama-3.1-8B",
+      "pair": "Qwen2.5-7B × Llama-3.1-8B",
       "kappa": 0.42,
       "c": 29.4,
       "w": 1.8,
@@ -2216,7 +2746,7 @@ window.siteResults = {
     {
       "tier": "7B tier",
       "level": "same family",
-      "pair": "Qwen2.5-7B \u00d7 Qwen2.5-3B",
+      "pair": "Qwen2.5-7B × Qwen2.5-3B",
       "kappa": 0.51,
       "c": 24.2,
       "w": 3.8,
@@ -2225,7 +2755,7 @@ window.siteResults = {
     {
       "tier": "7B tier",
       "level": "same family",
-      "pair": "Qwen2.5-7B \u00d7 Qwen3-1.7B-Base",
+      "pair": "Qwen2.5-7B × Qwen3-1.7B-Base",
       "kappa": 0.51,
       "c": 24.4,
       "w": 4.0,
@@ -2234,7 +2764,7 @@ window.siteResults = {
     {
       "tier": "7B tier",
       "level": "seed only",
-      "pair": "Llama-3.1-8B \u00d7 itself",
+      "pair": "Llama-3.1-8B × itself",
       "kappa": 0.51,
       "c": 24.6,
       "w": 3.0,
@@ -2243,7 +2773,7 @@ window.siteResults = {
     {
       "tier": "7B tier",
       "level": "seed only",
-      "pair": "Qwen2.5-7B \u00d7 itself",
+      "pair": "Qwen2.5-7B × itself",
       "kappa": 0.58,
       "c": 19.0,
       "w": 5.2,
