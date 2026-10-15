@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://arxiv.org/abs/2608.17253"> <img alt="arXiv Paper" src="https://img.shields.io/badge/arXiv-2608.17253-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white"></a>
-    <a href="https://drstranded.github.io/Co-RL/"> <img alt="Project Website" src="https://img.shields.io/badge/Project-Website-6d4b96?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+    <a href="https://williamium3000.github.io/Co-RL-website/"> <img alt="Project Website" src="https://img.shields.io/badge/Project-Website-6d4b96?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
     <a href="https://github.com/DrStranded/Co-RL"> <img alt="GitHub Code" src="https://img.shields.io/badge/GitHub-Code-blue?style=for-the-badge&logo=github&logoColor=white"></a>
     <a href="LICENSE"> <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-green?style=for-the-badge"></a>
 </p>
